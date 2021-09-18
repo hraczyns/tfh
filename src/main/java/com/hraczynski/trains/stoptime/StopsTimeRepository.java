@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface StopsTimeRepository extends CrudRepository<StopTime, Long> {
@@ -18,6 +19,12 @@ public interface StopsTimeRepository extends CrudRepository<StopTime, Long> {
     List<StopTime> findAll();
 
     @Query(value = "" +
+            "select a from StopTime a " +
+            "join fetch a.stop b " +
+            "where a.id = :id")
+    Optional<StopTime> findById(@Param("id") Long id);
+
+    @Query(value = "" +
             "select distinct a from StopTime a " +
             "join fetch a.stop b " +
             "join fetch a.trip c " +
@@ -26,3 +33,4 @@ public interface StopsTimeRepository extends CrudRepository<StopTime, Long> {
             "order by a.arrivalTime")
     List<StopTime> findByCityIdAndArrivalTimeGreaterThanOrderByArrivalTime(@Param("cityId") Long cityId, @Param("startTime") LocalDateTime startTime);
 }
+

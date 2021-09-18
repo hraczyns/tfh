@@ -11,7 +11,7 @@ public interface CityService {
 
     CityDTO deleteById(Long id);
 
-    CityDTO updateById(CityRequest dto);
+    CityDTO update(CityRequest dto);
 
     CityDTO patchById(CityRequest dto);
 }

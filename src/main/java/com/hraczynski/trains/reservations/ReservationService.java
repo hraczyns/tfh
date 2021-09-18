@@ -3,6 +3,7 @@ package com.hraczynski.trains.reservations;
 import org.springframework.hateoas.CollectionModel;
 
 import java.math.BigDecimal;
+import java.util.Map;
 
 public interface ReservationService {
     CollectionModel<ReservationDTO> getAll();
@@ -15,5 +16,7 @@ public interface ReservationService {
 
     ReservationDTO patchById(ReservationRequest request);
 
-    ReservationDTO addReservation(ReservationRequest request, BigDecimal price);
+    ReservationDTO addReservation(ReservationRequest request);
+
+    Map<String,Double> getPossibleDiscounts();
 }

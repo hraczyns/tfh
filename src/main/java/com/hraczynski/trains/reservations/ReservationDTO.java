@@ -1,5 +1,8 @@
 package com.hraczynski.trains.reservations;
 
+import com.hraczynski.trains.passengers.PassengerDTO;
+import com.hraczynski.trains.passengers.PassengerNotRegistered;
+import com.hraczynski.trains.payment.PriceDTO;
 import com.hraczynski.trains.stoptime.StopTimeDTO;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,10 +20,11 @@ import java.util.Set;
 public class ReservationDTO extends RepresentationModel<ReservationDTO> {
     private Long id;
     private List<StopTimeDTO> reservedRoute;
-    private Set<Long> idPassengers;
+    private Set<PassengerDTO> passengers;
+    private Set<PassengerNotRegistered> passengerNotRegisteredList;
     private LocalDateTime reservationDate;
-    private ReservationDiscount discount;
     private ReservationStatus status;
     private BigDecimal price;
+    private Set<PriceDTO> pricesInDetails;
 
 }

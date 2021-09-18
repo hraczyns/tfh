@@ -72,7 +72,6 @@ public class TrainServiceImpl extends AbstractService<Train, TrainRepository> im
 
     @Override
     public TrainDTO save(TrainRequest request) {
-        //TODO reservations
         log.info("Saving Train {}", request);
         Train train = mapper.map(request, Train.class);
         if (trainRepository.existsByRepresentationUnique(request.getRepresentationUnique())) {

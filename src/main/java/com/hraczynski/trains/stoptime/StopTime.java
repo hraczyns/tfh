@@ -1,8 +1,11 @@
 package com.hraczynski.trains.stoptime;
 
-import com.hraczynski.trains.trip.Trip;
-import lombok.*;
 import com.hraczynski.trains.city.City;
+import com.hraczynski.trains.trip.Trip;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,7 +16,6 @@ import java.time.LocalDateTime;
 @Setter
 @Entity
 @Table(name = "stops")
-@ToString
 public class StopTime {
     @Id
     @GeneratedValue

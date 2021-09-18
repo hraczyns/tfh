@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 @ToString
 public class StopTimeRequest {
     private Long id;
-    private CityRequest cityRequest;
+    private Long cityId;
     private LocalDateTime arrivalTime;
     private LocalDateTime departureTime;
 }

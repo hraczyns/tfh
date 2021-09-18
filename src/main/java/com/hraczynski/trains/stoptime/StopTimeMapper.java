@@ -1,8 +1,10 @@
 package com.hraczynski.trains.stoptime;
 
-import com.hraczynski.trains.city.*;
+import com.hraczynski.trains.city.City;
+import com.hraczynski.trains.city.CityDTO;
+import com.hraczynski.trains.city.CityRepository;
+import com.hraczynski.trains.city.CityRepresentationModelAssembler;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
-import com.hraczynski.trains.exceptions.definitions.IncoherentDataException;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -14,11 +16,12 @@ import java.util.stream.Collectors;
 @Slf4j
 public record StopTimeMapper(
         CityRepresentationModelAssembler cityRepresentationModelAssembler, CityRepository cityRepository,
+        StopsTimeRepository stopsTimeRepository,
         ModelMapper mapper) {
 
 
     public StopTimeDTO entityToDTO(StopTime stopTime) {
-        log.info("Mapping StopTime {} to StopTimeDTO", stopTime);
+        log.info("Mapping StopTime to StopTimeDTO");
         StopTimeDTO stopTimeDTO = new StopTimeDTO();
         stopTimeDTO.setId(stopTime.getId());
         stopTimeDTO.setCityDTO(cityRepresentationModelAssembler.toModel(stopTime.getStop()));
@@ -28,14 +31,9 @@ public record StopTimeMapper(
     }
 
     public StopTime requestToEntity(StopTimeRequest stopTimeRequest) {
-        log.info("Mapping StopTimeRequest {} to StopTime", stopTimeRequest);
+        log.info("Mapping StopTimeRequest to StopTime");
         StopTime stopTime = new StopTime();
-        City city = cityRepository.findById(stopTimeRequest.getCityRequest().getId())
-                .orElseThrow(() -> {
-                    log.error("Cannot find City with id = " + stopTimeRequest.getCityRequest().getId());
-                    return new EntityNotFoundException(City.class, "id = " + stopTimeRequest.getCityRequest().getId());
-                });
-        validateCity(city, stopTimeRequest.getCityRequest());
+        City city = findCityById(stopTimeRequest.getCityId());
         stopTime.setStop(city);
         stopTime.setId(stopTimeRequest.getId());
         stopTime.setArrivalTime(stopTimeRequest.getArrivalTime());
@@ -43,27 +41,19 @@ public record StopTimeMapper(
         return stopTime;
     }
 
-    private void validateCity(City city, CityRequest cityRequest) {
-        try {
-
-            boolean isValid = city.getCountry().getName().equals(cityRequest.getCountry())
-                    && city.getLat() == cityRequest.getLat()
-                    && city.getLon() == cityRequest.getLon()
-                    && city.getName().equals(cityRequest.getName());
-            if (!isValid) {
-                log.error("Provided data City and CityRequest with id = " + city.getId() + "are incoherent.");
-                throw new IncoherentDataException(City.class, CityRequest.class, "id = " + city.getId());
-            }
-        } catch (Exception e) {
-            log.error("Provided data City and CityRequest with id = " + city.getId() + "are incoherent.");
-            throw new IncoherentDataException(City.class, CityRequest.class, "id = " + city.getId());
-        }
+    private City findCityById(Long id) {
+        return cityRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Cannot find City with id = " + id);
+                    return new EntityNotFoundException(City.class, "id = " + id);
+                });
     }
 
     public StopTimeDTO requestToDTO(StopTimeRequest stopTimeRequest) {
-        log.info("Mapping StopTimeRequest {} to StopTimeDTO", stopTimeRequest);
+        log.info("Mapping StopTimeRequest to StopTimeDTO");
 
-        CityDTO cityDTO = mapper.map(stopTimeRequest.getCityRequest(), CityDTO.class);
+        City city = findCityById(stopTimeRequest.getCityId());
+        CityDTO cityDTO = mapper.map(city, CityDTO.class);
 
         StopTimeDTO stopTimeDTO = new StopTimeDTO();
         stopTimeDTO.setId(stopTimeRequest.getId());
@@ -71,6 +61,24 @@ public record StopTimeMapper(
         stopTimeDTO.setArrivalTime(stopTimeRequest.getArrivalTime());
         stopTimeDTO.setDepartureTime(stopTimeRequest.getDepartureTime());
         return stopTimeDTO;
+    }
+
+    public StopTime idToEntity(Long id) {
+        return stopsTimeRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Cannot find StopTime with id = " + id);
+                    return new EntityNotFoundException(StopTime.class, "id = " + id);
+                });
+    }
+
+    public List<StopTime> idsToEntities(List<Long> stopTimeIds) {
+        return stopTimeIds.stream().map(this::idToEntity).collect(Collectors.toList());
+    }
+
+    public List<StopTimeDTO> idsToDTOs(List<Long> stopTimeIds) {
+        return stopTimeIds.stream().map(this::idToEntity).collect(Collectors.toList()).stream()
+                .map(this::entityToDTO)
+                .collect(Collectors.toList());
     }
 
     public List<StopTime> requestToEntities(List<StopTimeRequest> stopTimeRequests) {
@@ -83,6 +91,5 @@ public record StopTimeMapper(
 
     public List<StopTimeDTO> requestToDTOs(List<StopTimeRequest> stopTimeRequests) {
         return stopTimeRequests.stream().map(this::requestToDTO).collect(Collectors.toList());
-
     }
 }

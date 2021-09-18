@@ -24,7 +24,7 @@ public class TrainRepresentationModelAssembler extends RepresentationModelAssemb
 
     @Override
     public TrainDTO toModel(Train entity) {
-        log.info("Transforming Train {} into model",entity);
+        log.info("Transforming Train into model");
         TrainDTO model = instantiateModel(entity);
         mapper.map(entity, model);
         model.add(linkTo(methodOn(TrainController.class).getById(entity.getId())).withSelfRel());

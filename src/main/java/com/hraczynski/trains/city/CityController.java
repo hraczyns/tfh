@@ -43,10 +43,10 @@ public class CityController {
     }
 
     @PutMapping
-    public ResponseEntity<Void> updateById(@Valid @RequestBody CityRequest request) {
-        CityDTO cityDTO = cityService.updateById(request);
+    public ResponseEntity<Void> update(@Valid @RequestBody CityRequest request) {
+        CityDTO cityDTO = cityService.update(request);
         if (cityDTO == null) {
-            throw new EntityNotFoundException(City.class, "id = " + request.getId(), request.toString());
+            throw new EntityNotFoundException(City.class, "id = " + request.getId());
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -55,7 +55,7 @@ public class CityController {
     public ResponseEntity<Void> patchById(@Valid @RequestBody CityRequest request) {
         CityDTO cityDTO = cityService.patchById(request);
         if (cityDTO == null) {
-            throw new EntityNotFoundException(City.class, "id = " + request.getId(), request.toString());
+            throw new EntityNotFoundException(City.class, "id = " + request.getId());
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

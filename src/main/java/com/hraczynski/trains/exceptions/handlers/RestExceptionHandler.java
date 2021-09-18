@@ -31,8 +31,22 @@ import java.util.Objects;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(InvalidRequestException.class)
+    protected ResponseEntity<Object> handleInvalidRequestException(InvalidRequestException exception) {
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST);
+        error.setMessage(exception.getMessage());
+        return buildResponseEntity(error);
+    }
+
     @ExceptionHandler(BadStopTimeIdsFormatRequestException.class)
     protected ResponseEntity<Object> handleBadStopTimeIdsFormatRequestException(BadStopTimeIdsFormatRequestException exception) {
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST);
+        error.setMessage(exception.getMessage());
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(CannotBindToReservationException.class)
+    protected ResponseEntity<Object> handleCannotBindToReservationException(CannotBindToReservationException exception) {
         ApiError error = new ApiError(HttpStatus.BAD_REQUEST);
         error.setMessage(exception.getMessage());
         return buildResponseEntity(error);

@@ -1,4 +1,3 @@
-
 insert into countries (id,name) values (1,'Austria');
 insert into countries (id,name) values (2,'Germany');
 insert into countries (id,name) values (3,'Spain');

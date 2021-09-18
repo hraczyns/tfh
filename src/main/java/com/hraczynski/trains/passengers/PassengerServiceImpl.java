@@ -39,7 +39,7 @@ public class PassengerServiceImpl extends AbstractService<Passenger, PassengerRe
     public PassengerDTO addPassenger(PassengerRequest request) {
         checkInput(request);
 
-        log.info("Saving Passenger {}", request); // TODO reservations
+        log.info("Saving Passenger {}", request);
         Passenger save = passengerRepository.save(mapper.map(request, Passenger.class));
         return assembler.toModel(save);
 

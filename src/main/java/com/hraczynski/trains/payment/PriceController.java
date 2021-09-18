@@ -18,4 +18,9 @@ public class PriceController {
         return new ResponseEntity<>(priceService.getPrice(stopTimeIds), HttpStatus.OK);
     }
 
+    @GetMapping("calculation_with_discount")
+    public ResponseEntity<PriceWithDiscount> getPriceWithDiscount(@RequestParam(name = "price") String price, @RequestParam(name = "discount") String discount) {
+        return new ResponseEntity<>(priceService.getPriceWithDiscount(price,discount),HttpStatus.OK);
+    }
+
 }

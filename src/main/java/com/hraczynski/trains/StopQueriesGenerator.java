@@ -35,7 +35,6 @@ public class StopQueriesGenerator {
         List<StopToDb> queriesStopsTemp = new ArrayList<>();
         List<String> queriesStops = new ArrayList<>();
         List<String> queriesTrip = new ArrayList<>();
-        List<String> queriesTripStops = new ArrayList<>();
         List<String> trainQueries = new ArrayList<>();
         List<String> fileContent = Files.readAllLines(Path.of("przejazdy.txt"));
         int id = 1;

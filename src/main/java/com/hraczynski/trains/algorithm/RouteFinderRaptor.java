@@ -159,7 +159,7 @@ public class RouteFinderRaptor {
         }
 
 
-        return journeys; // todo investigate need of list, its always one elementary by now
+        return journeys;
     }
 
     private City findCity(Long id) {

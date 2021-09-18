@@ -4,13 +4,13 @@ import com.hraczynski.trains.AbstractService;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import com.hraczynski.trains.exceptions.definitions.InvalidRouteInput;
 import com.hraczynski.trains.passengers.Passenger;
+import com.hraczynski.trains.passengers.PassengerNotRegisteredMapper;
 import com.hraczynski.trains.passengers.PassengerRepository;
-import com.hraczynski.trains.payment.PriceResolver;
+import com.hraczynski.trains.passengers.PassengerWithDiscount;
+import com.hraczynski.trains.payment.Discount;
+import com.hraczynski.trains.payment.PriceService;
 import com.hraczynski.trains.stoptime.StopTime;
 import com.hraczynski.trains.stoptime.StopTimeMapper;
-import com.hraczynski.trains.stoptime.StopTimeRequest;
-import com.hraczynski.trains.train.Train;
-import com.hraczynski.trains.train.TrainRepository;
 import com.hraczynski.trains.utils.PropertiesCopier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,16 +33,21 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     private final ReservationRepresentationModelAssembler assembler;
     private final ModelMapper mapper;
     private final StopTimeMapper stopTimeMapper;
-    private final TrainRepository trainRepository;
+    private final PassengerNotRegisteredMapper passengerNotRegisteredMapper;
+    private final PriceService priceService;
+    private final ReservationPricesBinder reservationPricesBinder;
+    private final ReservationTrainBinder reservationTrainBinder;
 
     @Override
     public CollectionModel<ReservationDTO> getAll() {
         log.info("Looking for all Reservations");
         Set<Reservation> reservations = reservationRepository.findAll();
+
         if (reservations == null || reservations.isEmpty()) {
             log.error("Cannot find any reservation");
             throw new EntityNotFoundException(Reservation.class, "none");
         }
+
         return assembler.toCollectionModel(reservations);
     }
 
@@ -54,78 +59,73 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     }
 
     @Override
-    public ReservationDTO addReservation(ReservationRequest request, BigDecimal price) {
+    public ReservationDTO addReservation(ReservationRequest request) {
         Reservation reservation = mapper.map(request, Reservation.class);
         checkRoute(request);
-        Set<Passenger> passengers = findPassengers(request.getIdPassengers());
+        Set<Passenger> passengers = findPassengers(request);
         Long id;
-        if (verifyFoundPassengers(passengers, request.getIdPassengers())) {
-            BigDecimal resPrice;
-            if (price == null) {
-                resPrice = calculatePrice(request);
-            } else {
-                resPrice = price;
-            }
+        if (verifyFoundPassengers(passengers, extractIdsFromPassengersRequest(request.getIdPassengersWithDiscounts()))) {
+            BigDecimal resPrice = priceService.getSumFromReservation(request);
+
             reservation.setPrice(resPrice);
             reservation.setPassengers(passengers);
             reservation.setStatus(ReservationStatus.IN_PROGRESS);
-            reservation.setReservedRoute(request.getReservedRoute().stream()
-                    .map(stopTimeMapper::requestToEntity)
-                    .collect(Collectors.toList()));
+            reservation.setReservedRoute(getReservedRoute(request));
             reservation.setReservationDate(LocalDateTime.now());
+            reservation.setPassengersNotRegistered(passengerNotRegisteredMapper.serialize(request.getPassengerNotRegisteredSet()));
 
-            bindTrainToReservation(reservation);
+            addPricesToReservation(reservation, request);
+            addTrainsToReservation(reservation);
 
-            log.info("Saving Reservation {}", reservation);
+            log.info("Saving Reservation");
             id = reservationRepository.save(reservation).getId();
+            log.info("Successfully saved");
 
         } else {
-            log.error("Cannot find Passenger with id in {}", request.getIdPassengers());
-            throw new EntityNotFoundException(Passenger.class, "id in " + request.getIdPassengers());
+            log.error("Cannot find Passenger with id in {}", extractIdsFromPassengersRequest(request.getIdPassengersWithDiscounts()));
+            throw new EntityNotFoundException(Passenger.class, "id in " + extractIdsFromPassengersRequest(request.getIdPassengersWithDiscounts()));
         }
         ReservationDTO reservationDTO = assembler.toModel(reservation.setId(id));
-        reservationDTO.setReservedRoute(stopTimeMapper.requestToDTOs(request.getReservedRoute()));
-        reservationDTO.setIdPassengers(request.getIdPassengers());
+        reservationDTO.setPassengerNotRegisteredList(request.getPassengerNotRegisteredSet());
 
         return reservationDTO;
     }
 
+    private void addPricesToReservation(Reservation reservation, ReservationRequest request) {
+        reservationPricesBinder.bind(
+                reservation,
+                priceService.getPriceResponseWithPassengers(
+                        request.getIdPassengersWithDiscounts(),
+                        request.getPassengerNotRegisteredSet(),
+                        request.getReservedRoute(),
+                        true
+                ));
+    }
+
+    private List<StopTime> getReservedRoute(ReservationRequest request) {
+        return stopTimeMapper.idsToEntities(request.getReservedRoute());
+    }
+
     private void checkRoute(ReservationRequest request) {
-        List<StopTimeRequest> reservedRoute = request.getReservedRoute();
+        List<Long> reservedRoute = request.getReservedRoute();
         if (reservedRoute == null || reservedRoute.size() < 2) {
             log.error("Route provided in input has uncompleted information.");
             throw new InvalidRouteInput();
         }
     }
 
-    private void bindTrainToReservation(Reservation reservation) {
-        List<StopTime> reservedRoute = reservation.getReservedRoute();
-        Set<Train> trains = new HashSet<>();
-        log.info("Binding trains to Reservation {}", reservation);
-        reservedRoute.forEach(s -> {
-            Optional<Train> trainByStopTimeId = trainRepository.findTrainByStopTimesId(s.getId());
-            trains.add(trainByStopTimeId.orElseThrow(() -> {
-                log.error("Cannot find Train with id = {}", s.getId());
-                return new EntityNotFoundException(Train.class, "stopTimeId = " + s.getId());
-            }));
-        });
-        reservation.setTrains(trains);
-    }
-
-    private BigDecimal calculatePrice(ReservationRequest request) {
-        PriceResolver.PriceResolverBuilder builder = PriceResolver.builder();
-        builder = builder
-                .withStopTimeRequests(request.getReservedRoute())
-                .withPassengersNumber(request.getIdPassengers().size());
-        if (request.getDiscount() != null) {
-            builder = builder.withReservationDiscount(request.getDiscount());
-        }
-        PriceResolver resolver = builder.build();
-        return resolver.calculatePrice();
+    private void addTrainsToReservation(Reservation reservation) {
+        reservationTrainBinder.bind(reservation);
     }
 
     private boolean verifyFoundPassengers(Set<Passenger> passengers, Set<Long> idPassengers) {
-        return passengers != null && !passengers.isEmpty() && passengers.size() == idPassengers.size() && passengers.stream().noneMatch(Objects::isNull);
+        return passengers != null && passengers.size() == idPassengers.size() && passengers.stream().noneMatch(Objects::isNull);
+    }
+
+    private Set<Long> extractIdsFromPassengersRequest(Set<PassengerWithDiscount> passengerWithDiscounts) {
+        return passengerWithDiscounts.stream()
+                .map(PassengerWithDiscount::getPassengerId)
+                .collect(Collectors.toSet());
     }
 
     private Set<Passenger> findPassengers(Set<Long> idPassengers) {
@@ -170,8 +170,8 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
 
         PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(request, entityById);
 
-        List<StopTime> stopTimes = stopTimeMapper.requestToEntities(request.getReservedRoute());
-        Set<Passenger> passengers = findPassengers(request.getIdPassengers());
+        List<StopTime> stopTimes = stopTimeMapper.idsToEntities(request.getReservedRoute());
+        Set<Passenger> passengers = findPassengers(request);
         entityById.setReservedRoute(stopTimes);
         entityById.setPassengers(passengers);
 
@@ -180,4 +180,15 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
         return assembler.toModel(saved);
     }
 
+    private Set<Passenger> findPassengers(ReservationRequest request) {
+        return findPassengers(extractIdsFromPassengersRequest(request.getIdPassengersWithDiscounts()));
+    }
+
+    @Override
+    public Map<String, Double> getPossibleDiscounts() {
+        log.info("Looking for all discounts");
+        return Arrays.stream(Discount.values())
+                .collect(Collectors.toMap(s -> s.name().toLowerCase(Locale.ROOT), Discount::getValue));
+
+    }
 }

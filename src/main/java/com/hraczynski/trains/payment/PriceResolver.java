@@ -1,9 +1,9 @@
 package com.hraczynski.trains.payment;
 
 import com.hraczynski.trains.city.City;
+import com.hraczynski.trains.city.CityRepository;
 import com.hraczynski.trains.exceptions.definitions.CannotCalculatePriceException;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
-import com.hraczynski.trains.reservations.ReservationDiscount;
 import com.hraczynski.trains.stoptime.StopTime;
 import com.hraczynski.trains.stoptime.StopTimeRequest;
 import com.hraczynski.trains.stoptime.StopsTimeRepository;
@@ -22,15 +22,19 @@ import java.util.Optional;
 
 
 @Slf4j
-@Builder(setterPrefix = "with") // todo repair passengerNumber
+@Builder(setterPrefix = "with")
 public class PriceResolver {
     private final List<StopTimeRequest> stopTimeRequests;
     private final List<Long> stopTimeIds;
-    private final ReservationDiscount reservationDiscount;
+    private final Discount discount;
     private final TripsRepository tripsRepository = BeanUtil.getBean(TripsRepository.class);
     private final StopsTimeRepository stopsTimeRepository = BeanUtil.getBean(StopsTimeRepository.class);
+    private final CityRepository cityRepository = BeanUtil.getBean(CityRepository.class);
     private final DistanceCalculator distanceCalculator = new DistanceCalculator();
-    private final int passengersNumber;
+
+    public static BigDecimal includeDiscount(BigDecimal price, Discount discount) {
+        return price.multiply(BigDecimal.valueOf((100 - discount.getValue()) / 100));
+    }
 
     public BigDecimal calculatePrice() {
         try {
@@ -42,17 +46,15 @@ public class PriceResolver {
                 log.info("Started calculating price for trip ids {}", stopTimeIds);
                 price = calculateSinglePriceWithOnlyIds();
             }
-
-            if (reservationDiscount != null) {
-                double disc = reservationDiscount.getValue();
-                price = price.multiply(BigDecimal.valueOf((100 - disc) / 100));
+            if (discount != null) {
+                log.info("Using set discount");
+                price = PriceResolver.includeDiscount(price, discount);
             }
             return price.setScale(2, RoundingMode.HALF_UP);
         } catch (Exception e) {
             log.error("Cannot perform calculation on the reservation.");
             throw new CannotCalculatePriceException(e.getMessage());
         }
-
     }
 
     private BigDecimal calculateSinglePriceWithOnlyIds() {
@@ -90,7 +92,7 @@ public class PriceResolver {
         StopTime stopTime = stopsTimeRepository.findById(stopTimeId)
                 .orElseThrow(() -> {
                     log.error("Cannot find StopTime with id = {}", stopTimeId);
-                    return new EntityNotFoundException(City.class, "id = " + stopTimeId);
+                    return new EntityNotFoundException(StopTime.class, "id = " + stopTimeId);
                 });
         return stopTime.getStop();
     }
@@ -108,7 +110,9 @@ public class PriceResolver {
             Optional<Trip> tripPrevOpt = tripsRepository.findTripByStopTimesId(prev.getId());
             if (tripOpt.isPresent() && tripPrevOpt.isPresent()) {
                 Trip trip = tripOpt.get();
-                double distanceBetween = distanceCalculator.calculate(current.getCityRequest(), prev.getCityRequest());
+                City cityCurrent = findCityById(current.getCityId());
+                City cityPrev = findCityById(prev.getCityId());
+                double distanceBetween = distanceCalculator.calculate(cityCurrent, cityPrev);
                 price = calc(price, trip, distanceBetween);
             } else {
                 log.error("Cannot find Trip by StopTime with id = " + (tripOpt.isPresent() ? prev.getId() : current.getId()));
@@ -116,6 +120,14 @@ public class PriceResolver {
             }
         }
         return price;
+    }
+
+    private City findCityById(Long id) {
+        return cityRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.error("Cannot find City with id = {}", id);
+                    return new EntityNotFoundException(City.class, "id = " + id);
+                });
     }
 
     private void validate(Object input) {

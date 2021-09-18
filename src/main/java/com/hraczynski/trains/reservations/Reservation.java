@@ -1,5 +1,6 @@
 package com.hraczynski.trains.reservations;
 
+import com.hraczynski.trains.payment.Price;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,6 +12,7 @@ import lombok.experimental.Accessors;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.math.BigDecimal;
@@ -37,17 +39,21 @@ public class Reservation {
     @ManyToMany
     @JoinColumn(name = "id_passenger")
     @NotNull
-    @Size(min = 1,message = "Cannot create reservation with not specified target passenger")
     private Set<Passenger> passengers;
     @ManyToMany(fetch = FetchType.LAZY)
     @NotNull
-    @Size(min = 2,message = "Reservation must contain at least two elements of route")
+    @Size(min = 2, message = "Reservation must contain at least two elements of route")
     private List<StopTime> reservedRoute;
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Error creating reservation. Status of reservation cannot be resolved.")
     private ReservationStatus status;
     @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "trains_reservations",joinColumns = @JoinColumn(name = "reservations_id"),inverseJoinColumns = @JoinColumn(name = "train_id"))
+    @JoinTable(name = "trains_reservations", joinColumns = @JoinColumn(name = "reservations_id"), inverseJoinColumns = @JoinColumn(name = "train_id"))
     @NotNull(message = "Error during binding trains with the reservation.")
     private Set<Train> trains;
+    @Pattern(regexp = "(^([a-zA-Z]+@[a-zA-Z]+,?)+$)|^null$")
+    private String passengersNotRegistered;
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "reservation")
+    @Size(min = 1, message = "Prices must be specified")
+    private Set<Price> prices;
 }

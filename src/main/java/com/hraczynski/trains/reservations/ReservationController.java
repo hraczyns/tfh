@@ -10,11 +10,13 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.math.BigDecimal;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/reservations", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-public class ReservationsController {
+@CrossOrigin(origins = "http://localhost:3000")
+public class ReservationController {
 
     private final ReservationService reservationService;
 
@@ -31,8 +33,8 @@ public class ReservationsController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationDTO> addReservation(@Valid @RequestBody ReservationRequest request, @RequestParam(required = false) BigDecimal price) {
-        ReservationDTO reservationDTO = reservationService.addReservation(request, price);
+    public ResponseEntity<ReservationDTO> addReservation(@Valid @RequestBody ReservationRequest request) {
+        ReservationDTO reservationDTO = reservationService.addReservation(request);
         return new ResponseEntity<>(reservationDTO, HttpStatus.CREATED);
     }
 
@@ -58,5 +60,10 @@ public class ReservationsController {
             throw new EntityNotFoundException(Reservation.class, "id = " + request.getId(), request.toString());
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/discounts/all")
+    public ResponseEntity<Map<String,Double>> getPossibleDiscounts() {
+        return new ResponseEntity<>(reservationService.getPossibleDiscounts(), HttpStatus.OK);
     }
 }

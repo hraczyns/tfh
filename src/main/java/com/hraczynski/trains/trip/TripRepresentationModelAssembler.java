@@ -25,7 +25,7 @@ public class TripRepresentationModelAssembler extends RepresentationModelAssembl
 
     @Override
     public TripDTO toModel(Trip entity) {
-        log.info("Transforming Trip {} into model", entity);
+        log.info("Transforming Trip into model");
         TripDTO tripDTO = instantiateModel(entity);
         tripDTO.setId(entity.getId());
         tripDTO.setStopTimeDTOList(stopTimeMapper.entitiesToDTOs(entity.getStopTimes()));

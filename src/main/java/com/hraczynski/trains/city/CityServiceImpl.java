@@ -46,7 +46,7 @@ public class CityServiceImpl extends AbstractService<City, CityRepository> imple
         checkInput(request);
         City mapped = mapper.map(request, City.class);
         mapped.setCountry(findCountryByName(request.getCountry()));
-        log.info("Saving City {}", request);
+        log.info("Saving City");
         City save = cityRepository.save(mapped);
         return assembler.toModel(save);
     }
@@ -60,13 +60,13 @@ public class CityServiceImpl extends AbstractService<City, CityRepository> imple
     }
 
     @Override
-    public CityDTO updateById(CityRequest request) {
+    public CityDTO update(CityRequest request) {
         checkInput(request);
         getEntityById(request.getId());
 
         City entity = mapper.map(request, City.class);
         entity.setCountry(findCountryByName(request.getCountry()));
-        log.info("Updating City {}", request);
+        log.info("Updating City");
         City saved = cityRepository.save(entity);
         return assembler.toModel(saved);
     }
@@ -89,7 +89,7 @@ public class CityServiceImpl extends AbstractService<City, CityRepository> imple
         City mapped = mapper.map(entity, City.class);
         mapped.setCountry(findCountryByName(request.getCountry()));
 
-        log.info("Patching City {}", request);
+        log.info("Patching City");
         cityRepository.save(mapped);
         return assembler.toModel(entity);
     }

@@ -13,6 +13,7 @@ public class PropertiesCopierTest {
 
     @Test
     public void shouldCopyPropertiesWhenClassAreDifferent() {
+        //given
         CityRequest cityRequest = new CityRequest()
                 .setId(5L)
                 .setCountry("poland")
@@ -23,8 +24,10 @@ public class PropertiesCopierTest {
         Country countryForTest = new Country(10L, "germany");
         City city = new City(10L, "previous", 10, 15, countryForTest);
 
+        //when
         PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(cityRequest, city);
 
+        //then
         assertAll(
                 () -> assertEquals(cityRequest.getId(), city.getId()),
                 () -> assertEquals(cityRequest.getName(), city.getName()),
@@ -36,6 +39,7 @@ public class PropertiesCopierTest {
 
     @Test
     public void shouldCopyPropertiesWhenClassAreDifferentExceptOfSomeFieldWhichAreNullOrEmpty() {
+        //given
         CityRequest cityRequest = new CityRequest()
                 .setId(5L)
                 .setCountry(null)
@@ -47,8 +51,10 @@ public class PropertiesCopierTest {
 
         City city = new City(10L, "previous", 10, 15, countryForTest);
 
+        //when
         PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(cityRequest, city);
 
+        //then
         assertAll(
                 () -> assertEquals(cityRequest.getId(), city.getId()),
                 () -> assertNotEquals(cityRequest.getName(), city.getName()),
@@ -60,6 +66,7 @@ public class PropertiesCopierTest {
 
     @Test
     public void shouldCopyPropertiesWhenClassAreDifferentAndSkipValuesAreProvided() {
+        //given
         CityRequest cityRequest = new CityRequest()
                 .setId(5L)
                 .setCountry(null)
@@ -71,19 +78,22 @@ public class PropertiesCopierTest {
 
         City city = new City(10L, "previous", 10, 15, countryForTest);
 
-        PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(cityRequest, city,"id","lat");
+        //when
+        PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(cityRequest, city, "id", "lat");
 
+        //then
         assertAll(
                 () -> assertNotEquals(cityRequest.getId(), city.getId()),
                 () -> assertNotEquals(cityRequest.getName(), city.getName()),
                 () -> assertNotEquals(cityRequest.getLat(), city.getLat()),
                 () -> assertEquals(cityRequest.getLon(), city.getLon()),
-                () -> Assertions.assertEquals(countryForTest, city.getCountry())
+                () -> assertEquals(countryForTest, city.getCountry())
         );
     }
 
     @Test
     public void shouldThrowExceptionWhenInputIsNull() {
+        //given
         CityRequest cityRequestNotNull = new CityRequest()
                 .setId(5L)
                 .setCountry(null)
@@ -95,6 +105,7 @@ public class PropertiesCopierTest {
 
         City cityNotNull = new City(10L, "previous", 10, 15, countryForTest);
 
+        //when-then
         assertAll(
                 () -> assertThrows(ErrorDuringPropertiesCopying.class, () -> PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(null, null)),
                 () -> assertThrows(ErrorDuringPropertiesCopying.class, () -> PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(cityRequestNotNull, null)),

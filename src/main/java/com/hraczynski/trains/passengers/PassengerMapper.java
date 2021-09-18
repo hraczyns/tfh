@@ -15,19 +15,31 @@ public class PassengerMapper {
 
     private final PassengerRepository repository;
 
-    //todo enhance
     public Passenger requestToEntityByRepo(PassengerRequest request) {
         Passenger foundEnt = repository.findById(request.getId())
                 .orElseThrow(() -> {
                     log.error("Cannot find Passenger with id = {}", request.getId());
                     return new EntityNotFoundException(Passenger.class, "id = " + request.getId());
                 });
-        Passenger passenger = new Passenger(request.getId(), request.getName(), request.getSurname(), request.getGender(), request.getCountry(), request.getNotes(), request.getBornDate(), foundEnt.getReservations());
-        return passenger;
+        return new Passenger(request.getId(), request.getName(), request.getSurname(), request.getGender(), request.getCountry(), request.getNotes(), request.getBornDate(), foundEnt.getReservations());
     }
 
     public Passenger requestToEntity(PassengerRequest request, Set<Reservation> reservations) {
-        Passenger passenger = new Passenger(request.getId(), request.getName(), request.getSurname(), request.getGender(), request.getCountry(), request.getNotes(), request.getBornDate(), reservations);
-        return passenger;
+        return new Passenger(request.getId(), request.getName(), request.getSurname(), request.getGender(), request.getCountry(), request.getNotes(), request.getBornDate(), reservations);
+    }
+
+    public PassengerDTO idToDTO(Long id) {
+        Passenger passenger = repository.findById(id).orElseThrow(() -> {
+            log.error("Cannot find Passenger with id = {}", id);
+            return new EntityNotFoundException(Passenger.class, "id = " + id);
+        });
+        return new PassengerDTO()
+                .setId(id)
+                .setCountry(passenger.getCountry())
+                .setGender(passenger.getGender())
+                .setName(passenger.getName())
+                .setNotes(passenger.getNotes())
+                .setSurname(passenger.getSurname())
+                .setBornDate(passenger.getBornDate());
     }
 }
