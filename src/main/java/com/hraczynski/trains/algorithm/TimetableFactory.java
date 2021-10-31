@@ -63,18 +63,6 @@ public class TimetableFactory {
                         routeStopsList.add(routeStops);
                     }
                 });
-
-
-//        tripList.forEach(s -> {
-//            List<City> collect = s.getStopTimes().stream()
-//                    .map(StopTime::getStop)
-//                    .collect(Collectors.toList());
-//            RouteStops routeStops = new RouteStops(collect);
-//
-//            if (!routeStopsList.contains(routeStops)) {
-//                routeStopsList.add(routeStops);
-//            }
-//        });
         routeInfoProvider = new RouteInfoProvider(routeStopsList);
     }
 }

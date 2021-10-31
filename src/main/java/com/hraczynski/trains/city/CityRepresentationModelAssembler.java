@@ -26,7 +26,6 @@ public class CityRepresentationModelAssembler extends RepresentationModelAssembl
         CityDTO cityDTO = instantiateModel(entity);
         mapper.map(entity, cityDTO);
         cityDTO.setCountry(entity.getCountry().getName());
-
         cityDTO.add(linkTo(methodOn(CityController.class).findById(entity.getId())).withSelfRel());
         return cityDTO;
     }

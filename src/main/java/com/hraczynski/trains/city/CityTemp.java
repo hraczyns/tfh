@@ -28,7 +28,7 @@ public class CityTemp {
     @JsonProperty("lng")
     private String lng;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new HashMap<>();
 
     public CityTemp(){}
 

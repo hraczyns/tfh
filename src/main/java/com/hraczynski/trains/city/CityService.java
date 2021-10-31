@@ -1,17 +1,17 @@
 package com.hraczynski.trains.city;
 
-import org.springframework.hateoas.CollectionModel;
+import java.util.Set;
 
 public interface CityService {
-    CityDTO getById(Long id);
+    City findById(Long id);
 
-    CollectionModel<CityDTO> findAll();
+    Set<City> findAll();
 
-    CityDTO save(CityRequest dto);
+    City save(CityRequest cityRequest);
 
-    CityDTO deleteById(Long id);
+    City deleteById(Long id);
 
-    CityDTO update(CityRequest dto);
+    void update(CityRequest cityRequest);
 
-    CityDTO patchById(CityRequest dto);
+    void patch(CityRequest cityRequest);
 }

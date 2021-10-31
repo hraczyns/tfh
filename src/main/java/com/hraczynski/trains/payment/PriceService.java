@@ -20,6 +20,8 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PriceService {
 
+    private final PriceResolver priceResolver;
+
     public PriceResponse getPrice(String stopTimeIds) {
         return getPrice(stopTimeIds, null);
     }
@@ -32,14 +34,13 @@ public class PriceService {
         for (int i = 1; i < stopTimeList.size(); i += 2) {
             Long id = stopTimeList.get(i);
             Long idPrev = stopTimeList.get(i - 1);
-            PriceResolver.PriceResolverBuilder priceResolverBuilder = new PriceResolver.PriceResolverBuilder()
+            PriceResolverConfig.PriceResolverConfigBuilder priceResolverConfigBuilder = PriceResolverConfig.builder()
                     .withStopTimeIds(Arrays.asList(id, idPrev));
             if (discount != null) {
-                priceResolverBuilder = priceResolverBuilder.withDiscount(discount);
+                priceResolverConfigBuilder = priceResolverConfigBuilder.withDiscount(discount);
             }
-            PriceResolver resolver = priceResolverBuilder
-                    .build();
-            BigDecimal calculatePrice = resolver.calculatePrice();
+            
+            BigDecimal calculatePrice = priceResolver.calculatePrice(priceResolverConfigBuilder.build());
             addToResponse(res, id, idPrev, calculatePrice);
         }
         log.info("Started calculated general price");

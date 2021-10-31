@@ -1,15 +1,15 @@
 package com.hraczynski.trains.city;
 
+import com.hraczynski.trains.AbstractService;
+import com.hraczynski.trains.country.Country;
+import com.hraczynski.trains.country.CountryRepository;
+import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import com.hraczynski.trains.utils.PropertiesCopier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.modelmapper.ModelMapper;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Service;
-import com.hraczynski.trains.AbstractService;
-import com.hraczynski.trains.country.Country;
-import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
-import com.hraczynski.trains.country.CountryRepository;
 
 import java.util.Set;
 
@@ -19,56 +19,53 @@ import java.util.Set;
 public class CityServiceImpl extends AbstractService<City, CityRepository> implements CityService {
 
     private final CityRepository cityRepository;
-    private final CityRepresentationModelAssembler assembler;
     private final ModelMapper mapper;
     private final CountryRepository countryRepository;
 
     @Override
-    public CityDTO getById(Long id) {
+    public City findById(Long id) {
         log.info("Looking for City with id = {}", id);
-        City entityById = getEntityById(id);
-        return assembler.toModel(entityById);
+        return getEntityById(id);
     }
 
     @Override
-    public CollectionModel<CityDTO> findAll() {
+    public Set<City> findAll() {
         log.info("Looking for all Cities");
         Set<City> all = cityRepository.findAll();
         if (all == null || all.isEmpty()) {
             log.error("Cannot find any cities");
             throw new EntityNotFoundException(City.class, "none");
         }
-        return assembler.toCollectionModel(all);
+        log.info(all.toString());
+        return all;
     }
 
     @Override
-    public CityDTO save(CityRequest request) {
+    public City save(CityRequest request) {
         checkInput(request);
         City mapped = mapper.map(request, City.class);
         mapped.setCountry(findCountryByName(request.getCountry()));
         log.info("Saving City");
-        City save = cityRepository.save(mapped);
-        return assembler.toModel(save);
+        return cityRepository.save(mapped);
     }
 
     @Override
-    public CityDTO deleteById(Long id) {
+    public City deleteById(Long id) {
         City byId = getEntityById(id);
         log.info("Deleting City with id = {}", id);
         cityRepository.deleteById(id);
-        return assembler.toModel(byId);
+        return byId;
     }
 
     @Override
-    public CityDTO update(CityRequest request) {
+    public void update(CityRequest request) {
         checkInput(request);
         getEntityById(request.getId());
 
         City entity = mapper.map(request, City.class);
         entity.setCountry(findCountryByName(request.getCountry()));
         log.info("Updating City");
-        City saved = cityRepository.save(entity);
-        return assembler.toModel(saved);
+        cityRepository.save(entity);
     }
 
     private Country findCountryByName(String country) {
@@ -80,18 +77,18 @@ public class CityServiceImpl extends AbstractService<City, CityRepository> imple
     }
 
     @Override
-    public CityDTO patchById(CityRequest request) {
+    public void patch(CityRequest request) {
         checkInput(request);
         City entity = getEntityById(request.getId());
 
         PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(request, entity);
+        String country = request.getCountry();
 
-        City mapped = mapper.map(entity, City.class);
-        mapped.setCountry(findCountryByName(request.getCountry()));
+        if (!StringUtils.isEmpty(country))
+            entity.setCountry(findCountryByName(country));
 
         log.info("Patching City");
-        cityRepository.save(mapped);
-        return assembler.toModel(entity);
+        cityRepository.save(entity);
     }
 
 }

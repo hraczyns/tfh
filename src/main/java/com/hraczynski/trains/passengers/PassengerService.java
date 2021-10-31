@@ -2,16 +2,18 @@ package com.hraczynski.trains.passengers;
 
 import org.springframework.hateoas.CollectionModel;
 
+import java.util.Set;
+
 public interface PassengerService {
-    CollectionModel<PassengerDTO> getAll();
+    Set<Passenger> getAll();
 
-    PassengerDTO getById(Long id);
+    Passenger getById(Long id);
 
-    PassengerDTO addPassenger(PassengerRequest request);
+    Passenger addPassenger(PassengerRequest request);
 
-    PassengerDTO deleteById(Long id);
+    Passenger deleteById(Long id);
 
-    PassengerDTO updateById(PassengerRequest request);
+    void update(PassengerRequest request);
 
-    PassengerDTO patchById(PassengerRequest request);
+    void patch(PassengerRequest request);
 }

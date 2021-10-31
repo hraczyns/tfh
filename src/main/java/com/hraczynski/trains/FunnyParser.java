@@ -24,9 +24,9 @@ import java.util.stream.Stream;
 public class FunnyParser {
 
     @Autowired
-    CityRepository repository;
+    CityRepository cityRepository;
     @Autowired
-    CountryRepository repository1;
+    CountryRepository countryRepository;
 
 //    @EventListener(ApplicationReadyEvent.class)
     public void parse() throws IOException {

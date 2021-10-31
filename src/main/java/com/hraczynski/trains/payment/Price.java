@@ -33,6 +33,6 @@ public class Price {
     private BigDecimal price;
     @Enumerated(EnumType.STRING)
     private Discount discount;
-    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST},mappedBy = "priceEntity")
+    @OneToMany(fetch = FetchType.LAZY, cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE}, mappedBy = "priceEntity")
     private List<PartPrice> partPrices;
 }

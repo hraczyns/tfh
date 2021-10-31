@@ -1,9 +1,15 @@
-package com.hraczynski.trains.controllers;
+package com.hraczynski.trains.builders;
 
+import com.hraczynski.trains.city.City;
 import com.hraczynski.trains.city.CityDTO;
 import com.hraczynski.trains.city.CityRequest;
+import com.hraczynski.trains.country.Country;
 import com.natpryce.makeiteasy.Instantiator;
+import com.natpryce.makeiteasy.Maker;
 import com.natpryce.makeiteasy.Property;
+
+import static com.natpryce.makeiteasy.MakeItEasy.a;
+import static com.natpryce.makeiteasy.MakeItEasy.with;
 
 public abstract class CityTestBuilder {
 
@@ -12,6 +18,7 @@ public abstract class CityTestBuilder {
     private static final Long ID = 11L;
     private static final double LON = 20.0;
     private static final double LAT = 31.0;
+    private static final Country COUNTRY_OBJECT = new Country(1L, COUNTRY_STRING);
 
     public static final Property<CityDTO, String> nameDTO = Property.newProperty();
     public static final Property<CityDTO, String> countryDTO = Property.newProperty();
@@ -24,6 +31,13 @@ public abstract class CityTestBuilder {
     public static final Property<CityRequest, Long> idRequest = Property.newProperty();
     public static final Property<CityRequest, Double> lonRequest = Property.newProperty();
     public static final Property<CityRequest, Double> latRequest = Property.newProperty();
+
+    public static final Property<City, String> nameEntity = Property.newProperty();
+    public static final Property<City, Country> countryEntity = Property.newProperty();
+    public static final Property<City, Long> idEntity = Property.newProperty();
+    public static final Property<City, Double> lonEntity = Property.newProperty();
+    public static final Property<City, Double> latEntity = Property.newProperty();
+
 
     public static final Instantiator<CityDTO> BasicCityDTO = propertyLookup -> {
         CityDTO cityDTO = new CityDTO();
@@ -45,6 +59,20 @@ public abstract class CityTestBuilder {
         return cityRequest;
     };
 
+    public static final Instantiator<City> BasicCityEntity = propertyLookup -> {
+        City city = new City();
+        city.setId(propertyLookup.valueOf(idEntity, ID));
+        city.setCountry(propertyLookup.valueOf(countryEntity, COUNTRY_OBJECT));
+        city.setName(propertyLookup.valueOf(nameEntity, NAME));
+        city.setLat(propertyLookup.valueOf(latEntity, LAT));
+        city.setLon(propertyLookup.valueOf(lonEntity, LON));
+        return city;
+    };
 
+    public static final Instantiator<CityRequest> EmptyCityRequestWithOnlyId = propertyLookup -> new CityRequest().setId(propertyLookup.valueOf(idRequest, 2L));
 
+    public static final Maker<City> PatchCityEntityMaker = a(BasicCityEntity)
+            .but(with(nameEntity, "randomText"))
+            .but(with(latEntity, Double.MIN_VALUE))
+            .but(with(lonEntity, Double.MAX_VALUE));
 }

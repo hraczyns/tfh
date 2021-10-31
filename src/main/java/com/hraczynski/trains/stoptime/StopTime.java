@@ -25,6 +25,6 @@ public class StopTime {
     private City stop;
     private LocalDateTime departureTime;
     private LocalDateTime arrivalTime;
-    @ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST,CascadeType.MERGE})
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Trip trip;
 }

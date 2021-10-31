@@ -1,0 +1,12 @@
+{
+  "id": 1,
+  "name": "Radom",
+  "country": "Poland",
+  "lon": 20.0,
+  "lat": 31.0,
+  "_links": {
+    "self": {
+      "href": "http://localhost/api/cities/1"
+    }
+  }
+}

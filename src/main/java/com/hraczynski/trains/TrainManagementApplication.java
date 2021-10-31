@@ -5,8 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.io.IOException;
 
-//@SpringBootApplication(scanBasePackages = { "pl.hub.flights","pl.hub.flights.controllers","pl.hub.flights.entities","pl.hub.flights.hateoasmodels","pl.hub.flights.repositories","pl.hub.flights.services","pl.hub.flights.utils"})
-@SpringBootApplication(scanBasePackages = {"com.hraczynski.trains"})
+//@SpringBootApplication(scanBasePackages = { "com.hraczynski.trains","com.hraczynski.trains.city","com.hraczynski.trains.country","com.hraczynski.trains.passengers","com.hraczynski.trains.payment","com.hraczynski.trains.city.CityService.java","com.hraczynski.trains.reservations","com.hraczynski.trains.routefinder"})
+@SpringBootApplication
 public class TrainManagementApplication {
 
     public static void main(String[] args) throws IOException {

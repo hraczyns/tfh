@@ -1,4 +1,4 @@
-package com.hraczynski.trains.controllers.unit;
+package com.hraczynski.trains.controllers;
 
 import com.hraczynski.trains.city.*;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
@@ -15,23 +15,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-import static com.hraczynski.trains.controllers.CityTestBuilder.BasicCityDTO;
-import static com.hraczynski.trains.controllers.CityTestBuilder.BasicCityRequest;
+import static com.hraczynski.trains.builders.CityTestBuilder.*;
 import static com.natpryce.makeiteasy.MakeItEasy.a;
 import static com.natpryce.makeiteasy.MakeItEasy.make;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("City controller tests")
 class CityControllerTest {
 
     private static final Long ID = 10L;
-
+    @Mock
+    private CityRepresentationModelAssembler assembler;
     @Mock
     private CityService cityService;
     @Captor
@@ -41,43 +43,49 @@ class CityControllerTest {
 
     @BeforeEach
     public void setup() {
-        controller = new CityController(cityService);
+        controller = new CityController(cityService, assembler);
     }
 
     @Test
     @DisplayName("Find by id")
     void findById() {
         //given
+        City city = givenCity();
         CityDTO cityDTO = givenDTO();
-        when(cityService.getById(anyLong())).thenReturn(cityDTO);
+        when(cityService.findById(anyLong())).thenReturn(city);
+        when(assembler.toModel(city)).thenReturn(cityDTO);
 
         //when
-        ResponseEntity<CityDTO> responseEntity = controller.findById(cityDTO.getId());
+        ResponseEntity<CityDTO> responseEntity = controller.findById(city.getId());
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isEqualTo(cityDTO);
-        verify(cityService).getById(cityDTO.getId());
+        verify(cityService).findById(city.getId());
+        verifyAssembler(city);
     }
 
     @Test
     @DisplayName("Doesn't find by id")
     void notFindById() {
         //given
-        when(cityService.getById(ID)).thenThrow(new EntityNotFoundException(City.class, "id = " + ID));
+        when(cityService.findById(ID)).thenThrow(new EntityNotFoundException(City.class, "id = " + ID));
 
         //when
         //then
-        assertThatCode(()->controller.findById(ID)).isInstanceOf(EntityNotFoundException.class);
-        verify(cityService).getById(ID);
+        assertThatCode(() -> controller.findById(ID)).isInstanceOf(EntityNotFoundException.class);
+        verify(cityService).findById(ID);
+        verifyNeverAssembler();
     }
 
     @Test
     @DisplayName("Find all")
     void findAll() {
         //given
-        CollectionModel<CityDTO> collectionModel = preparedCollectionModel();
-        when(cityService.findAll()).thenReturn(collectionModel);
+        Set<City> citySet = givenCitySet();
+        CollectionModel<CityDTO> collectionModel = givenCollectionModel();
+        when(cityService.findAll()).thenReturn(citySet);
+        when(assembler.toCollectionModel(citySet)).thenReturn(collectionModel);
 
         //when
         ResponseEntity<CollectionModel<CityDTO>> all = controller.findAll();
@@ -85,6 +93,8 @@ class CityControllerTest {
         //then
         assertThat(all.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(all.getBody()).isEqualTo(collectionModel);
+        verify(cityService).findAll();
+        verifyAssembler(citySet);
 
     }
 
@@ -98,22 +108,26 @@ class CityControllerTest {
         //then
         assertThatCode(() -> controller.findAll()).isInstanceOf(EntityNotFoundException.class);
         verify(cityService).findAll();
+        verifyNeverAssembler();
     }
 
     @Test
     @DisplayName("Delete by id")
     void deleteById() {
         //given
+        City city = givenCity();
         CityDTO cityDTO = givenDTO();
-        when(cityService.deleteById(cityDTO.getId())).thenReturn(cityDTO);
+        when(cityService.deleteById(city.getId())).thenReturn(city);
+        when(assembler.toModel(city)).thenReturn(cityDTO);
 
         //when
-        ResponseEntity<CityDTO> responseEntity = controller.deleteById(cityDTO.getId());
+        ResponseEntity<CityDTO> responseEntity = controller.deleteById(city.getId());
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(responseEntity.getBody()).isEqualTo(cityDTO);
-        verify(cityService).deleteById(cityDTO.getId());
+        verify(cityService).deleteById(city.getId());
+        verifyAssembler(city);
     }
 
     @Test
@@ -126,15 +140,14 @@ class CityControllerTest {
         //then
         assertThatCode(() -> controller.deleteById(ID)).isInstanceOf(EntityNotFoundException.class);
         verify(cityService).deleteById(ID);
+        verifyNeverAssembler();
     }
 
     @Test
     @DisplayName("Updates city by city request")
     void update() {
         //given
-        CityDTO cityDTO = givenDTO();
         CityRequest cityRequest = givenRequest();
-        when(cityService.update(cityRequest)).thenReturn(cityDTO);
 
         //when
         ResponseEntity<Void> responseEntity = controller.update(cityRequest);
@@ -144,30 +157,14 @@ class CityControllerTest {
 
         verify(cityService).update(argumentCaptor.capture());
         assertThat(cityRequest).isEqualTo(argumentCaptor.getValue());
-    }
 
-    @Test
-    @DisplayName("Doesn't update city by city request")
-    void notUpdate() {
-        //given
-        CityRequest city = givenRequest();
-        when(cityService.update(city)).thenThrow(new EntityNotFoundException(City.class, "id = " + ID));
-
-        //when
-        //then
-        assertThatCode(() -> controller.update(city)).isInstanceOf(EntityNotFoundException.class);
-
-        verify(cityService).update(argumentCaptor.capture());
-        assertThat(city).isEqualTo(argumentCaptor.getValue());
     }
 
     @Test
     @DisplayName("Patch by city request")
     void patchByCityRequest() {
         //given
-        CityDTO cityDTO = givenDTO();
         CityRequest city = givenRequest();
-        when(cityService.patchById(city)).thenReturn(cityDTO);
 
         //when
         ResponseEntity<Void> responseEntity = controller.patchById(city);
@@ -175,22 +172,7 @@ class CityControllerTest {
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        verify(cityService).patchById(argumentCaptor.capture());
-        assertThat(city).isEqualTo(argumentCaptor.getValue());
-    }
-
-    @Test
-    @DisplayName("Doesn't patch city by city request")
-    void notPatchByCityRequest() {
-        //given
-        CityRequest city = givenRequest();
-        when(cityService.patchById(city)).thenThrow(new EntityNotFoundException(City.class, "id = " + ID));
-
-        //when
-        //then
-        assertThatCode(() -> controller.patchById(city)).isInstanceOf(EntityNotFoundException.class);
-
-        verify(cityService).patchById(argumentCaptor.capture());
+        verify(cityService).patch(argumentCaptor.capture());
         assertThat(city).isEqualTo(argumentCaptor.getValue());
     }
 
@@ -199,18 +181,21 @@ class CityControllerTest {
     void saveCity() {
         //given
         CityDTO cityDTO = givenDTO();
-        CityRequest city = givenRequest();
-        when(cityService.save(city)).thenReturn(cityDTO);
+        City city = givenCity();
+        CityRequest cityRequest = givenRequest();
+        when(cityService.save(cityRequest)).thenReturn(city);
+        when(assembler.toModel(city)).thenReturn(cityDTO);
 
         //when
-        ResponseEntity<CityDTO> responseEntity = controller.addCity(city);
+        ResponseEntity<CityDTO> responseEntity = controller.addCity(cityRequest);
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(responseEntity.getBody()).isEqualTo(cityDTO);
 
         verify(cityService).save(argumentCaptor.capture());
-        assertThat(city).isEqualTo(argumentCaptor.getValue());
+        assertThat(cityRequest).isEqualTo(argumentCaptor.getValue());
+        verifyAssembler(city);
     }
 
     @Test
@@ -226,9 +211,22 @@ class CityControllerTest {
 
         verify(cityService).save(argumentCaptor.capture());
         assertThat(city).isEqualTo(argumentCaptor.getValue());
+        verifyNeverAssembler();
     }
 
-    private CollectionModel<CityDTO> preparedCollectionModel() {
+    private void verifyNeverAssembler() {
+        verify(assembler,never()).toModel(any(City.class));
+    }
+
+    private void verifyAssembler(City city) {
+        verify(assembler).toModel(city);
+    }
+
+    private void verifyAssembler(Set<City> cities) {
+        verify(assembler).toCollectionModel(cities);
+    }
+
+    private CollectionModel<CityDTO> givenCollectionModel() {
         return CollectionModel.of(Collections.singletonList(givenDTO()));
     }
 
@@ -239,4 +237,13 @@ class CityControllerTest {
     private CityRequest givenRequest() {
         return make(a(BasicCityRequest));
     }
+
+    private City givenCity() {
+        return make(a(BasicCityEntity));
+    }
+
+    private Set<City> givenCitySet() {
+        return new HashSet<>(List.of(givenCity()));
+    }
+
 }

@@ -10,10 +10,10 @@ import com.hraczynski.trains.stoptime.StopsTimeRepository;
 import com.hraczynski.trains.train.TrainType;
 import com.hraczynski.trains.trip.Trip;
 import com.hraczynski.trains.trip.TripsRepository;
-import com.hraczynski.trains.utils.BeanUtil;
 import com.hraczynski.trains.utils.DistanceCalculator;
-import lombok.Builder;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -22,29 +22,34 @@ import java.util.Optional;
 
 
 @Slf4j
-@Builder(setterPrefix = "with")
+@Service
+@RequiredArgsConstructor
 public class PriceResolver {
-    private final List<StopTimeRequest> stopTimeRequests;
-    private final List<Long> stopTimeIds;
-    private final Discount discount;
-    private final TripsRepository tripsRepository = BeanUtil.getBean(TripsRepository.class);
-    private final StopsTimeRepository stopsTimeRepository = BeanUtil.getBean(StopsTimeRepository.class);
-    private final CityRepository cityRepository = BeanUtil.getBean(CityRepository.class);
+    private final TripsRepository tripsRepository;
+    private final StopsTimeRepository stopsTimeRepository;
+    private final CityRepository cityRepository;
     private final DistanceCalculator distanceCalculator = new DistanceCalculator();
 
     public static BigDecimal includeDiscount(BigDecimal price, Discount discount) {
         return price.multiply(BigDecimal.valueOf((100 - discount.getValue()) / 100));
     }
 
-    public BigDecimal calculatePrice() {
+    public BigDecimal calculatePrice(PriceResolverConfig config) {
+        if(config == null){
+            return BigDecimal.valueOf(0.0);
+        }
+        List<StopTimeRequest> stopTimeRequests = config.getStopTimeRequests();
+        Discount discount = config.getDiscount();
+        List<Long> stopTimeIds = config.getStopTimeIds();
+
         try {
             BigDecimal price;
             if (stopTimeRequests != null) {
                 log.info("Started calculating price for trip {}", stopTimeRequests);
-                price = calculateSinglePrice();
+                price = calculateSinglePrice(stopTimeRequests);
             } else {
                 log.info("Started calculating price for trip ids {}", stopTimeIds);
-                price = calculateSinglePriceWithOnlyIds();
+                price = calculateSinglePriceWithOnlyIds(stopTimeIds);
             }
             if (discount != null) {
                 log.info("Using set discount");
@@ -57,13 +62,12 @@ public class PriceResolver {
         }
     }
 
-    private BigDecimal calculateSinglePriceWithOnlyIds() {
-        validate(this.stopTimeIds);
+    private BigDecimal calculateSinglePriceWithOnlyIds(List<Long> stopTimeIds) {
+        validate(stopTimeIds);
         BigDecimal price = new BigDecimal(0);
-        List<Long> timeIds = this.stopTimeIds;
-        for (int i = 1, timeIdsSize = timeIds.size(); i < timeIdsSize; i++) {
-            Long stopTimeId = timeIds.get(i);
-            Long stopTimeIdPrev = timeIds.get(i - 1);
+        for (int i = 1, timeIdsSize = stopTimeIds.size(); i < timeIdsSize; i++) {
+            Long stopTimeId = stopTimeIds.get(i);
+            Long stopTimeIdPrev = stopTimeIds.get(i - 1);
             Optional<Trip> tripByStopTimesId = tripsRepository.findTripByStopTimesId(stopTimeId);
             Optional<Trip> tripByStopTimesIdPrev = tripsRepository.findTripByStopTimesId(stopTimeId);
             if (tripByStopTimesId.isPresent() && tripByStopTimesIdPrev.isPresent()) {
@@ -97,13 +101,12 @@ public class PriceResolver {
         return stopTime.getStop();
     }
 
-    private BigDecimal calculateSinglePrice() {
+    private BigDecimal calculateSinglePrice(List<StopTimeRequest> stopTimeRequests) {
         BigDecimal price = new BigDecimal(0);
-        List<StopTimeRequest> stopTimeDTOList = this.stopTimeRequests;
-        validate(stopTimeDTOList);
-        for (int i = 1; i < stopTimeDTOList.size(); i++) {
-            StopTimeRequest current = stopTimeDTOList.get(i);
-            StopTimeRequest prev = stopTimeDTOList.get(i - 1);
+        validate(stopTimeRequests);
+        for (int i = 1; i < stopTimeRequests.size(); i++) {
+            StopTimeRequest current = stopTimeRequests.get(i);
+            StopTimeRequest prev = stopTimeRequests.get(i - 1);
             validate(current);
             validate(prev);
             Optional<Trip> tripOpt = tripsRepository.findTripByStopTimesId(current.getId());

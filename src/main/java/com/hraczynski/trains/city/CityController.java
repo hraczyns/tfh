@@ -1,6 +1,5 @@
 package com.hraczynski.trains.city;
 
-import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
@@ -9,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -16,47 +16,46 @@ import javax.validation.Valid;
 @CrossOrigin(origins = "http://localhost:3000")
 public class CityController {
     private final CityService cityService;
+    private final CityRepresentationModelAssembler assembler;
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<CityDTO> findById(@PathVariable Long id) {
-        CityDTO byId = cityService.getById(id);
-        return new ResponseEntity<>(byId, HttpStatus.OK);
+        City byId = cityService.findById(id);
+        CityDTO cityDTO = assembler.toModel(byId);
+        return new ResponseEntity<>(cityDTO, HttpStatus.OK);
     }
 
 
     @GetMapping("/all")
     public ResponseEntity<CollectionModel<CityDTO>> findAll() {
-        CollectionModel<CityDTO> all = cityService.findAll();
-        return new ResponseEntity<>(all, HttpStatus.OK);
+        Set<City> all = cityService.findAll();
+        CollectionModel<CityDTO> dtos = assembler.toCollectionModel(all);
+        return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<CityDTO> addCity(@Valid @RequestBody CityRequest request) {
-        CityDTO save = cityService.save(request);
-        return new ResponseEntity<>(save, HttpStatus.CREATED);
+        City save = cityService.save(request);
+        CityDTO cityDTO = assembler.toModel(save);
+        return new ResponseEntity<>(cityDTO, HttpStatus.CREATED);
     }
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<CityDTO> deleteById(@PathVariable Long id) {
-        CityDTO cityDTO = cityService.deleteById(id);
+        City city = cityService.deleteById(id);
+        CityDTO cityDTO = assembler.toModel(city);
         return new ResponseEntity<>(cityDTO, HttpStatus.OK);
     }
 
     @PutMapping
     public ResponseEntity<Void> update(@Valid @RequestBody CityRequest request) {
-        CityDTO cityDTO = cityService.update(request);
-        if (cityDTO == null) {
-            throw new EntityNotFoundException(City.class, "id = " + request.getId());
-        }
+        cityService.update(request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping
     public ResponseEntity<Void> patchById(@Valid @RequestBody CityRequest request) {
-        CityDTO cityDTO = cityService.patchById(request);
-        if (cityDTO == null) {
-            throw new EntityNotFoundException(City.class, "id = " + request.getId());
-        }
+        cityService.patch(request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

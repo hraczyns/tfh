@@ -1,0 +1,71 @@
+{
+  "_embedded": {
+    "cityDTOList": [
+      {
+        "id": 2,
+        "name": "Radom2",
+        "country": "Germany",
+        "lon": 0.2,
+        "lat": 3.2,
+        "_links": {
+          "self": {
+            "href": "http://localhost/api/cities/2"
+          }
+        }
+      },
+      {
+        "id": 3,
+        "name": "Radom3",
+        "country": "Poland",
+        "lon": 10.0,
+        "lat": 30.0,
+        "_links": {
+          "self": {
+            "href": "http://localhost/api/cities/3"
+          }
+        }
+      },
+      {
+        "id": 4,
+        "name": "Radom4",
+        "country": "Germany",
+        "lon": 102.0,
+        "lat": 0.2,
+        "_links": {
+          "self": {
+            "href": "http://localhost/api/cities/4"
+          }
+        }
+      },
+      {
+        "id": 5,
+        "name": "Radom5",
+        "country": "Germany",
+        "lon": 0.2,
+        "lat": 30.22,
+        "_links": {
+          "self": {
+            "href": "http://localhost/api/cities/5"
+          }
+        }
+      },
+      {
+        "id": 11,
+        "name": "Radom",
+        "country": "Poland",
+        "lon": 20.0,
+        "lat": 31.0,
+        "_links": {
+          "self": {
+            "href": "http://localhost/api/cities/11"
+          }
+        }
+      }
+    ]
+  },
+  "_links": {
+    "self": {
+      "href": "http://localhost/api/cities/all"
+    }
+  }
+}
