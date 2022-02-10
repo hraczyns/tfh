@@ -16,5 +16,5 @@ public class ReservationRequest {
     private Long id;
     private List<Long> reservedRoute;
     private Set<PassengerWithDiscount> idPassengersWithDiscounts;
-    private Set<PassengerNotRegistered> passengerNotRegisteredSet;
+    private List<PassengerNotRegistered> passengerNotRegisteredList;
 }

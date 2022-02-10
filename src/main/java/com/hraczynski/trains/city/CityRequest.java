@@ -13,6 +13,6 @@ public class CityRequest {
     private Long id;
     private String name;
     private String country;
-    private double lon;
-    private double lat;
+    private Double lon;
+    private Double lat;
 }

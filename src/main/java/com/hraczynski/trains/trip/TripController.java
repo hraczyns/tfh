@@ -7,28 +7,31 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Set;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "api/trips", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
 public class TripController {
 
     private final TripService tripService;
+    private final TripRepresentationModelAssembler assembler;
 
     @GetMapping(path = "/{id}")
     public ResponseEntity<TripDTO> getById(@PathVariable Long id) {
-        TripDTO byId = tripService.getById(id);
-        return new ResponseEntity<>(byId, HttpStatus.OK);
+        Trip byId = tripService.getById(id);
+        return new ResponseEntity<>(assembler.toModel(byId), HttpStatus.OK);
     }
 
     @GetMapping("/all")
     public ResponseEntity<CollectionModel<TripDTO>> getAll() {
-        CollectionModel<TripDTO> all = tripService.getAll();
-        return new ResponseEntity<>(all, HttpStatus.OK);
+        Set<Trip> all = tripService.getAll();
+        return new ResponseEntity<>(assembler.toCollectionModel(all), HttpStatus.OK);
     }
 
-    @GetMapping( params = "train_id")
+    @GetMapping(params = "train_id")
     public ResponseEntity<CollectionModel<TripDTO>> getTripsByTrainId(@RequestParam(name = "train_id") Long trainId) {
-        CollectionModel<TripDTO> tripsByTrainId = tripService.getTripsByTrainId(trainId);
-        return new ResponseEntity<>(tripsByTrainId,HttpStatus.OK);
+        Set<Trip> tripsByTrainId = tripService.getTripsByTrainId(trainId);
+        return new ResponseEntity<>(assembler.toCollectionModel(tripsByTrainId), HttpStatus.OK);
     }
 }

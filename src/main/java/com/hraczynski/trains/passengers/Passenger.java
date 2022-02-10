@@ -23,13 +23,12 @@ public class Passenger {
     private String name;
     @NotBlank(message = "Surname is demanded")
     private String surname;
-    @NotBlank(message = "Gender is demanded")
-    private String gender;
     @NotBlank(message = "Country is demanded")
     private String country;
-    private String notes;
     @NotNull(message = "Born date is demanded")
     private LocalDate bornDate;
+    @NotNull(message = "Email is demanded")
+    private String email;
     @ManyToMany(mappedBy = "passengers", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
     private Set<Reservation> reservations;
 }

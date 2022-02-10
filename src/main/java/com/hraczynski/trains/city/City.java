@@ -19,12 +19,13 @@ public class City {
     private Long id;
     @NotNull(message = "Name must not be null")
     private String name;
-    private double lon;
-    private double lat;
+    @NotNull(message = "Lon must not be null")
+    private Double lon;
+    @NotNull(message = "Lat must not be null")
+    private Double lat;
     @ManyToOne
     @NotNull(message = "Country must not be null")
     private Country country;
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

@@ -1,6 +1,5 @@
 {
   "status": "NOT_FOUND",
-  "timestamp": "31-10-2021 04:00:35 CONSIDER THAT, how to test that hmmm",
   "message": "City was not found for input parameters: none",
   "debugMessage": "",
   "subErrors": []

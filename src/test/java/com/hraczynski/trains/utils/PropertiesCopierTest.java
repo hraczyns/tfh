@@ -18,11 +18,11 @@ public class PropertiesCopierTest {
                 .setId(5L)
                 .setCountry("poland")
                 .setLat(3.5)
-                .setLon(10)
+                .setLon(10.2)
                 .setName("test");
 
         Country countryForTest = new Country(10L, "germany");
-        City city = new City(10L, "previous", 10, 15, countryForTest);
+        City city = new City(10L, "previous", 10.2, 15.3, countryForTest);
 
         //when
         PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(cityRequest, city);
@@ -44,12 +44,12 @@ public class PropertiesCopierTest {
                 .setId(5L)
                 .setCountry(null)
                 .setLat(3.5)
-                .setLon(10)
+                .setLon(10.2)
                 .setName("");
 
         Country countryForTest = new Country(10L, "germany");
 
-        City city = new City(10L, "previous", 10, 15, countryForTest);
+        City city = new City(10L, "previous", 10.2, 15.1, countryForTest);
 
         //when
         PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(cityRequest, city);
@@ -71,12 +71,12 @@ public class PropertiesCopierTest {
                 .setId(5L)
                 .setCountry(null)
                 .setLat(3.5)
-                .setLon(10)
+                .setLon(10.2)
                 .setName("");
 
         Country countryForTest = new Country(10L, "germany");
 
-        City city = new City(10L, "previous", 10, 15, countryForTest);
+        City city = new City(10L, "previous", 10.2, 15.1, countryForTest);
 
         //when
         PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(cityRequest, city, "id", "lat");
@@ -98,12 +98,12 @@ public class PropertiesCopierTest {
                 .setId(5L)
                 .setCountry(null)
                 .setLat(3.5)
-                .setLon(10)
+                .setLon(10.2)
                 .setName("");
 
         Country countryForTest = new Country(10L, "germany");
 
-        City cityNotNull = new City(10L, "previous", 10, 15, countryForTest);
+        City cityNotNull = new City(10L, "previous", 10.2, 15.1, countryForTest);
 
         //when-then
         assertAll(

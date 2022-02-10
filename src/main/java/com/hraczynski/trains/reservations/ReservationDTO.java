@@ -21,7 +21,7 @@ public class ReservationDTO extends RepresentationModel<ReservationDTO> {
     private Long id;
     private List<StopTimeDTO> reservedRoute;
     private Set<PassengerDTO> passengers;
-    private Set<PassengerNotRegistered> passengerNotRegisteredList;
+    private List<PassengerNotRegistered> passengerNotRegisteredList;
     private LocalDateTime reservationDate;
     private ReservationStatus status;
     private BigDecimal price;

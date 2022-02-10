@@ -1,21 +1,20 @@
 package com.hraczynski.trains.train;
 
-import org.springframework.hateoas.CollectionModel;
-
 import java.util.List;
+import java.util.Set;
 
 public interface TrainService {
-    CollectionModel<TrainDTO> getAll();
+    Set<Train> findAll();
 
-    TrainDTO getById(Long id);
+    Train findById(Long id);
 
-    TrainDTO save(TrainRequest request);
+    Train save(TrainRequest request);
 
-    TrainDTO deleteById(Long id);
+    Train deleteById(Long id);
 
-    TrainDTO updateById(TrainRequest request);
+    void update(TrainRequest request);
 
-    TrainDTO patchById(TrainRequest request);
+    void patch(TrainRequest request);
 
     byte[] getOneTrainImage(Long trainId);
 

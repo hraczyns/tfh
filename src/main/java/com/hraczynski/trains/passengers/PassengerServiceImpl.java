@@ -58,7 +58,6 @@ public class PassengerServiceImpl extends AbstractService<Passenger, PassengerRe
         getEntityById(request.getId());
 
         Passenger mapped = mapper.map(request, Passenger.class);
-//        mapped.setReservations(entityById.getReservations()); consider that
         log.info("Updating Passenger with id = {}", request.getId());
         passengerRepository.save(mapped);
     }
@@ -69,6 +68,7 @@ public class PassengerServiceImpl extends AbstractService<Passenger, PassengerRe
         Passenger passenger = getEntityById(request.getId());
 
         PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(request, passenger);
+//      !  passenger.setReservations(entityById.getReservations()); consider that
 
         log.info("Patching Passenger with id = {} ", request.getId());
         passengerRepository.save(passenger);

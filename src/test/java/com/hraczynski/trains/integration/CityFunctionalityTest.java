@@ -12,11 +12,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static com.hraczynski.trains.builders.CityTestBuilder.BasicCityRequest;
@@ -24,6 +26,7 @@ import static com.hraczynski.trains.builders.CityTestBuilder.EmptyCityRequestWit
 import static com.natpryce.makeiteasy.MakeItEasy.a;
 import static com.natpryce.makeiteasy.MakeItEasy.make;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -39,6 +42,8 @@ public class CityFunctionalityTest extends AbstractIntegrationTest {
     private static final String INSERT_COUNTRY = "/static/tests_sqls/country_insert.sql";
     private static final String API = "/api/cities";
     private static final String RESET_COUNTER = "/static/tests_sqls/reset_counter_city_id.sql";
+    private static final long EXISTING_CITY_ID = 2L;
+    private static final long NOT_EXISTING_CITY_ID = 2123123L;
 
     @Autowired
     private CityRepository cityRepository;
@@ -60,8 +65,6 @@ public class CityFunctionalityTest extends AbstractIntegrationTest {
     @Nested
     @DisplayName("Positive test cases")
     class TestCases {
-        private static final long EXISTING_CITY_ID = 2L;
-        private static final long NOT_EXISTING_CITY_ID = 2123123L;
 
         @AfterEach
         void cleanAfter() {
@@ -143,8 +146,6 @@ public class CityFunctionalityTest extends AbstractIntegrationTest {
     @Nested
     @DisplayName("Negative test cases")
     class NegativeTestCases {
-        private static final long EXISTING_CITY_ID = 2L;
-        private static final long NOT_EXISTING_CITY_ID = 2123123L;
 
         @AfterEach
         void cleanAfter() {
@@ -160,18 +161,48 @@ public class CityFunctionalityTest extends AbstractIntegrationTest {
             }
         }
 
-//        @DisplayName("Not find all - 0 entities")
-//        @Test
-//        void findAll() throws Exception {
-//            simpleVerifyGet(API + "/all", "cities.json");
-//        }
-//
-//        @DisplayName("Find by id")
-//        @Test
-//        void findById() throws Exception {
-//            simpleVerifyGet(API + "/" + EXISTING_CITY_ID, "city_one.json");
-//        }
+        @DisplayName("Does not found all - 0 entities")
+        @Test
+        void notFindAll() throws Exception {
+            simpleVerifyGet(API + "/all", "0cities_found.json", NOT_FOUND);
+        }
 
+        @DisplayName("Does not found by id")
+        @Test
+        void notFindById() throws Exception {
+            simpleVerifyGet(API + "/" + NOT_EXISTING_CITY_ID, "no_city_found_by_id.json", NOT_FOUND);
+        }
+
+        @DisplayName("Does not save")
+        @ParameterizedTest(name = "Does not save n.{index}")
+        @MethodSource("argsForSave")
+        @Sql(scripts = INSERT_COUNTRY)
+        void notSave(String jsonPath, Object arg, HttpStatus status) throws Exception {
+            simpleVerifyPost(API, jsonPath, arg, status);
+        }
+
+        private static Stream<Arguments> argsForSave() {
+            return Stream.of(
+                    Arguments.of("lack_of_field.json", new CityRequest()
+                                    .setCountry("Germany")
+                                    .setLat(40.3),
+                            HttpStatus.BAD_REQUEST),
+                    Arguments.of("country_not_exist.json", new CityRequest()
+                                    .setLat(10.2)
+                                    .setLon(4.1)
+                                    .setName("tralal")
+                                    .setCountry("nah"),
+                            HttpStatus.NOT_FOUND),
+                    Arguments.of("invalid_json.json", Map.of(
+                                    "id", 1L,
+                                    "country", "Germany",
+                                    "lon", "sth",
+                                    "lat", 40.3,
+                                    "name", "sth"
+                            ),
+                            HttpStatus.BAD_REQUEST)
+            );
+        }
 
     }
 

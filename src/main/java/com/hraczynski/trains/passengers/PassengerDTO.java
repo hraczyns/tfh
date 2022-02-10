@@ -14,8 +14,7 @@ public class PassengerDTO extends RepresentationModel<PassengerDTO> {
     private Long id;
     private String name;
     private String surname;
-    private String gender;
     private String country;
-    private String notes;
     private LocalDate bornDate;
+    private String email;
 }

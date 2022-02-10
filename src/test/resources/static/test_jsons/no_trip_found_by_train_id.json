@@ -1,0 +1,6 @@
+{
+  "status": "NOT_FOUND",
+  "message": "Trip was not found for input parameters: trainId\u003d50",
+  "debugMessage": "",
+  "subErrors": []
+}

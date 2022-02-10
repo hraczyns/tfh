@@ -154,7 +154,7 @@ public class RouteFinderRaptor {
         }
 
         if (journeys.isEmpty()) {
-            log.error("Cannot find any available route from {} to {} with starting time {}", source, destination, startFindingTime);
+            log.error("Cannot find any available route from {} to {} with starting time {}", source.getName(), destination.getName(), startFindingTime);
             throw new RouteNotExistException(sourceId, destinationId, startFindingTime);
         }
 

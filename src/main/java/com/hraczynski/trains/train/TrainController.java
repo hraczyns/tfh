@@ -1,7 +1,10 @@
 package com.hraczynski.trains.train;
 
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
+import com.hraczynski.trains.trip.Trip;
+import com.hraczynski.trains.trip.TripService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -11,53 +14,57 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/trains", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, "images/svg+xml"})
-@CrossOrigin(origins = "http://localhost:3000")
+@Slf4j
+@CrossOrigin(origins = "http://localhost:3006")
 public class TrainController {
     private final TrainService trainService;
+    private final TripService tripService;
+    private final TrainRepresentationModelAssembler assembler;
 
     @GetMapping(value = "/all")
-    public ResponseEntity<CollectionModel<TrainDTO>> getAll() {
-        CollectionModel<TrainDTO> flights = trainService.getAll();
-        return new ResponseEntity<>(flights, HttpStatus.OK);
+    public ResponseEntity<CollectionModel<TrainDTO>> findAll() {
+        Set<Train> trains = trainService.findAll();
+        CollectionModel<TrainDTO> collectionModel = assembler.toCollectionModel(trains);
+        collectionModel.forEach(this::specifyUsedParameter);
+        return new ResponseEntity<>(collectionModel, HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<TrainDTO> getById(@RequestParam("id") Long id) {
-        TrainDTO flight = trainService.getById(id);
-        return new ResponseEntity<>(flight, HttpStatus.OK);
+    public ResponseEntity<TrainDTO> findById(@RequestParam("id") Long id) {
+        Train train = trainService.findById(id);
+        TrainDTO trainDTO = assembler.toModel(train);
+        specifyUsedParameter(trainDTO);
+        return new ResponseEntity<>(trainDTO, HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<TrainDTO> addTrain(@Valid @RequestBody TrainRequest trainRequest) {
-        TrainDTO saved = trainService.save(trainRequest);
-        return new ResponseEntity<>(saved, HttpStatus.CREATED);
+        Train saved = trainService.save(trainRequest);
+        return new ResponseEntity<>(assembler.toModel(saved), HttpStatus.CREATED);
     }
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<TrainDTO> deleteById(@PathVariable Long id) {
-        TrainDTO flight = trainService.deleteById(id);
-        return new ResponseEntity<>(flight, HttpStatus.OK);
+        Train train = trainService.deleteById(id);
+        TrainDTO trainDTO = assembler.toModel(train);
+        specifyUsedParameter(trainDTO);
+        return new ResponseEntity<>(trainDTO, HttpStatus.OK);
     }
 
     @PutMapping
-    public ResponseEntity<Void> updateById(@Valid @RequestBody TrainRequest request) {
-        TrainDTO updated = trainService.updateById(request);
-        if (updated == null) {
-            throw new EntityNotFoundException(Train.class, "id = " + request.getId(), request.toString());
-        }
+    public ResponseEntity<Void> update(@Valid @RequestBody TrainRequest request) {
+        trainService.update(request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @PatchMapping
-    public ResponseEntity<Void> patchById(@Valid @RequestBody TrainRequest request) {
-        TrainDTO trainDTO = trainService.patchById(request);
-        if (trainDTO == null) {
-            throw new EntityNotFoundException(Train.class, "id = " + request.getId(), request.toString());
-        }
+    public ResponseEntity<Void> patch(@Valid @RequestBody TrainRequest request) {
+        trainService.patch(request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -83,6 +90,19 @@ public class TrainController {
         final HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Type", "images/svg+xml");
         return headers;
+    }
+
+    private void specifyUsedParameter(TrainDTO trainDTO) {
+        log.info("Looking for Trips by train id = {}", trainDTO.getId());
+        Set<Trip> tripsByTrainId;
+        try {
+            tripsByTrainId = tripService.getTripsByTrainId(trainDTO.getId());
+        } catch (EntityNotFoundException e) {
+            tripsByTrainId = null;
+        }
+        if (tripsByTrainId != null && !tripsByTrainId.isEmpty()) {
+            trainDTO.setUsed(true);
+        }
     }
 
 

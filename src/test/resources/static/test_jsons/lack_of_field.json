@@ -1,0 +1,19 @@
+{
+  "status": "BAD_REQUEST",
+  "message": "Validation error!",
+  "debugMessage": "",
+  "subErrors": [
+    {
+      "object": "City",
+      "field": "lon",
+      "rejectedValue": null,
+      "message": "Lon must not be null"
+    },
+    {
+      "object": "City",
+      "field": "name",
+      "rejectedValue": null,
+      "message": "Name must not be null"
+    }
+  ]
+}

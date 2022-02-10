@@ -1,0 +1,61 @@
+{
+  "_embedded": {
+    "tripDTOList": [
+      {
+        "id": 1,
+        "stopTimeDTOList": [
+          {
+            "id": 2,
+            "cityDTO": {
+              "id": 2,
+              "name": "Radom2",
+              "country": "Germany",
+              "lon": 0.2,
+              "lat": 3.2,
+              "_links": {
+                "self": {
+                  "href": "http://localhost/api/cities/2"
+                }
+              }
+            },
+            "arrivalTime": "+169104628-12-10T19:08:16",
+            "departureTime": "2021-03-15T09:10:00"
+          },
+          {
+            "id": 6,
+            "cityDTO": {
+              "id": 3,
+              "name": "Radom3",
+              "country": "Poland",
+              "lon": 10.0,
+              "lat": 30.0,
+              "_links": {
+                "self": {
+                  "href": "http://localhost/api/cities/3"
+                }
+              }
+            },
+            "arrivalTime": "2021-03-15T10:00:00",
+            "departureTime": "+169104628-12-10T19:08:16"
+          }
+        ],
+        "_links": {
+          "self": {
+            "href": "http://localhost/api/trips/1"
+          },
+          "all": {
+            "href": "http://localhost/api/trips/all"
+          },
+          "train": {
+            "href": "http://localhost/api/trains?id=21"
+          }
+        }
+      }
+    ]
+  },
+  "_links": {
+    "self": {
+      "href": "http://localhost/api/trips/all"
+    }
+  }
+}

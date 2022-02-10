@@ -90,16 +90,16 @@ public class PriceService {
         return getPriceResponseWithPassengersCommon(passengersRegisteredWithPotentialDiscounts, null, stopTimeIds);
     }
 
-    public PriceResponseWithPassengers getPriceResponseWithPassengers(Set<PassengerWithDiscount> passengersRegisteredWithPotentialDiscounts, Set<PassengerNotRegistered> passengerNotRegisteredSet, List<StopTimeRequest> stopTimeRequests) {
+    public PriceResponseWithPassengers getPriceResponseWithPassengers(Set<PassengerWithDiscount> passengersRegisteredWithPotentialDiscounts, List<PassengerNotRegistered> passengerNotRegisteredList, List<StopTimeRequest> stopTimeRequests) {
         List<Long> stopTimeIds = stopTimeRequests.stream().map(StopTimeRequest::getId).collect(Collectors.toList());
-        return getPriceResponseWithPassengersCommon(passengersRegisteredWithPotentialDiscounts, passengerNotRegisteredSet, stopTimeIds);
+        return getPriceResponseWithPassengersCommon(passengersRegisteredWithPotentialDiscounts, passengerNotRegisteredList, stopTimeIds);
     }
 
-    public PriceResponseWithPassengers getPriceResponseWithPassengers(Set<PassengerWithDiscount> passengersRegisteredWithPotentialDiscounts, Set<PassengerNotRegistered> passengerNotRegisteredSet, List<Long> stopTimeIds, @SuppressWarnings("unused") boolean onlyStopTimeIds) {
-        return getPriceResponseWithPassengersCommon(passengersRegisteredWithPotentialDiscounts, passengerNotRegisteredSet, stopTimeIds);
+    public PriceResponseWithPassengers getPriceResponseWithPassengers(Set<PassengerWithDiscount> passengersRegisteredWithPotentialDiscounts, List<PassengerNotRegistered> passengerNotRegisteredList, List<Long> stopTimeIds, @SuppressWarnings("unused") boolean onlyStopTimeIds) {
+        return getPriceResponseWithPassengersCommon(passengersRegisteredWithPotentialDiscounts, passengerNotRegisteredList, stopTimeIds);
     }
 
-    private PriceResponseWithPassengers getPriceResponseWithPassengersCommon(Set<PassengerWithDiscount> passengersRegisteredWithPotentialDiscounts, Set<PassengerNotRegistered> passengerNotRegisteredSet, List<Long> stopTimeIds) {
+    private PriceResponseWithPassengers getPriceResponseWithPassengersCommon(Set<PassengerWithDiscount> passengersRegisteredWithPotentialDiscounts, List<PassengerNotRegistered> passengerNotRegisteredList, List<Long> stopTimeIds) {
 
         Set<PricePerPassenger> pricePerPassengers = passengersRegisteredWithPotentialDiscounts.stream()
                 .map(passenger -> new PricePerPassenger()
@@ -107,8 +107,8 @@ public class PriceService {
                         .setPriceResponse(getPriceResponse(stopTimeIds, passenger.getDiscountCode())))
                 .collect(Collectors.toSet());
         Set<PricePerNogRegisteredPassenger> pricePerNogRegisteredPassengers = new HashSet<>();
-        if (passengerNotRegisteredSet != null && !passengerNotRegisteredSet.isEmpty()) {
-            pricePerNogRegisteredPassengers = passengerNotRegisteredSet.stream()
+        if (passengerNotRegisteredList != null && !passengerNotRegisteredList.isEmpty()) {
+            pricePerNogRegisteredPassengers = passengerNotRegisteredList.stream()
                     .map(passenger -> new PricePerNogRegisteredPassenger()
                             .setPassengerNotRegistered(passenger)
                             .setPriceResponse(getPriceResponse(stopTimeIds, passenger.getDiscountCode())))
@@ -159,7 +159,7 @@ public class PriceService {
     public BigDecimal getSumFromReservation(ReservationRequest request) {
         PriceResponseWithPassengers priceResponseWithPassengers = getPriceResponseWithPassengers(
                 request.getIdPassengersWithDiscounts(),
-                request.getPassengerNotRegisteredSet(),
+                request.getPassengerNotRegisteredList(),
                 request.getReservedRoute(),
                 true
         );

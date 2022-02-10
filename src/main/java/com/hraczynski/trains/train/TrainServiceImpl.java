@@ -6,13 +6,10 @@ import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import com.hraczynski.trains.exceptions.definitions.InputDoesNotMatchesPattern;
 import com.hraczynski.trains.exceptions.definitions.NonUniqueFieldException;
 import com.hraczynski.trains.images.ImagesProcessor;
-import com.hraczynski.trains.trip.TripDTO;
-import com.hraczynski.trains.trip.TripService;
 import com.hraczynski.trains.utils.PropertiesCopier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
-import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -31,11 +28,9 @@ public class TrainServiceImpl extends AbstractService<Train, TrainRepository> im
 
     private final ModelMapper mapper;
     private final TrainRepository trainRepository;
-    private final TrainRepresentationModelAssembler assembler;
-    private final TripService tripService;
     private final ImagesProcessor imagesProcessor;
 
-    public CollectionModel<TrainDTO> getAll() {
+    public Set<Train> findAll() {
         log.info("Looking for all Trains");
         Set<Train> all = trainRepository.findAll();
 
@@ -43,74 +38,53 @@ public class TrainServiceImpl extends AbstractService<Train, TrainRepository> im
             log.error("Cannot find any Train");
             throw new EntityNotFoundException(Train.class, "none");
         }
-        CollectionModel<TrainDTO> trainDTOS = assembler.toCollectionModel(all);
-        trainDTOS.forEach(this::specifyUsedParameter);
-        return trainDTOS;
+        return all;
     }
 
     @Override
-    public TrainDTO getById(Long id) {
-        Train entityById = getEntityById(id);
-        TrainDTO trainDTO = assembler.toModel(entityById);
-        specifyUsedParameter(trainDTO);
-        return trainDTO;
-
-    }
-
-    private void specifyUsedParameter(TrainDTO trainDTO) {
-        log.info("Looking for Trips by train id = {}", trainDTO.getId());
-        CollectionModel<TripDTO> tripsByTrainId;
-        try {
-            tripsByTrainId = tripService.getTripsByTrainId(trainDTO.getId());
-        } catch (EntityNotFoundException e) {
-            tripsByTrainId = null;
-        }
-        if (tripsByTrainId != null && !tripsByTrainId.getContent().isEmpty()) {
-            trainDTO.setUsed(true);
-        }
+    public Train findById(Long id) {
+        log.info("Looking for Train with id = {}", id);
+        return getEntityById(id);
     }
 
     @Override
-    public TrainDTO save(TrainRequest request) {
+    public Train save(TrainRequest request) {
         log.info("Saving Train {}", request);
         Train train = mapper.map(request, Train.class);
         if (trainRepository.existsByRepresentationUnique(request.getRepresentationUnique())) {
             log.error("Representation unique value has to be unique.");
             throw new NonUniqueFieldException(TrainRequest.class, "RepresentationUnique", request.getRepresentationUnique());
         }
-        Train saved = trainRepository.save(train);
-        return assembler.toModel(saved);
+        return trainRepository.save(train);
     }
 
     @Override
-    public TrainDTO deleteById(Long id) {
+    public Train deleteById(Long id) {
         Train entityById = getEntityById(id);
 
         log.info("Deleting Train with id = {}", id);
         trainRepository.deleteById(id);
-        return assembler.toModel(entityById);
+        return entityById;
     }
 
     @Override
-    public TrainDTO updateById(TrainRequest request) {
+    public void update(TrainRequest request) {
         checkInput(request);
         getEntityById(request.getId());
 
         log.info("Updating Train with id = {}", request.getId());
-        Train saved = trainRepository.save(mapper.map(request, Train.class));
-        return assembler.toModel(saved);
+        trainRepository.save(mapper.map(request, Train.class));
     }
 
     @Override
-    public TrainDTO patchById(TrainRequest request) {
+    public void patch(TrainRequest request) {
         checkInput(request);
         Train entityById = getEntityById(request.getId());
 
         PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(request, entityById);
 
         log.info("Patching Train with id = {}", request.getId());
-        Train saved = trainRepository.save(entityById);
-        return assembler.toModel(saved);
+        trainRepository.save(entityById);
     }
 
     @Override

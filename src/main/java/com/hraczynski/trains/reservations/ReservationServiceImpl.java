@@ -72,7 +72,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
             reservation.setStatus(ReservationStatus.IN_PROGRESS);
             reservation.setReservedRoute(getReservedRoute(request));
             reservation.setReservationDate(LocalDateTime.now());
-            reservation.setPassengersNotRegistered(passengerNotRegisteredMapper.serialize(request.getPassengerNotRegisteredSet()));
+            reservation.setPassengersNotRegistered(passengerNotRegisteredMapper.serialize(request.getPassengerNotRegisteredList()));
 
             addPricesToReservation(reservation, request);
             addTrainsToReservation(reservation);
@@ -86,7 +86,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
             throw new EntityNotFoundException(Passenger.class, "id in " + extractIdsFromPassengersRequest(request.getIdPassengersWithDiscounts()));
         }
         ReservationDTO reservationDTO = assembler.toModel(reservation.setId(id));
-        reservationDTO.setPassengerNotRegisteredList(request.getPassengerNotRegisteredSet());
+        reservationDTO.setPassengerNotRegisteredList(request.getPassengerNotRegisteredList());
 
         return reservationDTO;
     }
@@ -96,7 +96,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
                 reservation,
                 priceService.getPriceResponseWithPassengers(
                         request.getIdPassengersWithDiscounts(),
-                        request.getPassengerNotRegisteredSet(),
+                        request.getPassengerNotRegisteredList(),
                         request.getReservedRoute(),
                         true
                 ));

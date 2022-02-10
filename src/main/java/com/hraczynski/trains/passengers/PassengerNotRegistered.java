@@ -8,5 +8,6 @@ import lombok.experimental.Accessors;
 public class PassengerNotRegistered {
     private String name;
     private String surname;
+    private String email;
     private String discountCode;
 }

@@ -32,7 +32,7 @@ public class TripRepresentationModelAssembler extends RepresentationModelAssembl
 
         tripDTO.add(linkTo(methodOn(TripController.class).getById(entity.getId())).withSelfRel());
         tripDTO.add(linkTo(methodOn(TripController.class).getAll()).withRel("all"));
-        tripDTO.add(linkTo(methodOn(TrainController.class).getById(entity.getTrain().getId())).withRel("train"));
+        tripDTO.add(linkTo(methodOn(TrainController.class).findById(entity.getTrain().getId())).withRel("train"));
 
         return tripDTO;
     }

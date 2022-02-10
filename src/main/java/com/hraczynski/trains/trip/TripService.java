@@ -1,11 +1,13 @@
 package com.hraczynski.trains.trip;
 
 
-import org.springframework.hateoas.CollectionModel;
+import java.util.Set;
 
 public interface TripService {
 
-    TripDTO getById(Long id);
-    CollectionModel<TripDTO> getAll();
-    CollectionModel<TripDTO> getTripsByTrainId(Long id);
+    Trip getById(Long id);
+
+    Set<Trip> getAll();
+
+    Set<Trip> getTripsByTrainId(Long id);
 }

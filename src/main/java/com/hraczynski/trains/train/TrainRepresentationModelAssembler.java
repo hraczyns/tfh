@@ -27,15 +27,15 @@ public class TrainRepresentationModelAssembler extends RepresentationModelAssemb
         log.info("Transforming Train into model");
         TrainDTO model = instantiateModel(entity);
         mapper.map(entity, model);
-        model.add(linkTo(methodOn(TrainController.class).getById(entity.getId())).withSelfRel());
-        model.add(linkTo(methodOn(TrainController.class).getAll()).withRel("all"));
+        model.add(linkTo(methodOn(TrainController.class).findById(entity.getId())).withSelfRel());
+        model.add(linkTo(methodOn(TrainController.class).findAll()).withRel("all"));
         model.add(linkTo(methodOn(TripController.class).getTripsByTrainId(entity.getId())).withRel("trips"));
         return model;
     }
 
     public CollectionModel<TrainDTO> toCollectionModel(Iterable<? extends Train> entities) {
         CollectionModel<TrainDTO> flightDTOS = super.toCollectionModel(entities);
-        flightDTOS.add(linkTo(methodOn(TrainController.class).getAll()).withSelfRel());
+        flightDTOS.add(linkTo(methodOn(TrainController.class).findAll()).withSelfRel());
         return flightDTOS;
     }
 }
