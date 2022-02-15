@@ -28,12 +28,12 @@ public class PassengerMapper {
         return new Passenger(request.getId(), request.getName(), request.getSurname(), request.getCountry(), request.getBornDate(), request.getEmail(), reservations);
     }
 
-    public PassengerDTO idToDTO(Long id) {
+    public PassengerDto idToDto(Long id) {
         Passenger passenger = repository.findById(id).orElseThrow(() -> {
             log.error("Cannot find Passenger with id = {}", id);
             return new EntityNotFoundException(Passenger.class, "id = " + id);
         });
-        return new PassengerDTO()
+        return new PassengerDto()
                 .setId(id)
                 .setCountry(passenger.getCountry())
                 .setName(passenger.getName())

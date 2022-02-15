@@ -1,7 +1,7 @@
 package com.hraczynski.trains.stoptime;
 
 import com.hraczynski.trains.city.City;
-import com.hraczynski.trains.city.CityDTO;
+import com.hraczynski.trains.city.CityDto;
 import com.hraczynski.trains.city.CityRepository;
 import com.hraczynski.trains.city.CityRepresentationModelAssembler;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
@@ -20,14 +20,14 @@ public record StopTimeMapper(
         ModelMapper mapper) {
 
 
-    public StopTimeDTO entityToDTO(StopTime stopTime) {
-        log.info("Mapping StopTime to StopTimeDTO");
-        StopTimeDTO stopTimeDTO = new StopTimeDTO();
-        stopTimeDTO.setId(stopTime.getId());
-        stopTimeDTO.setCityDTO(cityRepresentationModelAssembler.toModel(stopTime.getStop()));
-        stopTimeDTO.setArrivalTime(stopTime.getArrivalTime());
-        stopTimeDTO.setDepartureTime(stopTime.getDepartureTime());
-        return stopTimeDTO;
+    public StopTimeDto entityToDto(StopTime stopTime) {
+        log.info("Mapping StopTime to StopTimeDto");
+        StopTimeDto stopTimeDto = new StopTimeDto();
+        stopTimeDto.setId(stopTime.getId());
+        stopTimeDto.setCityDto(cityRepresentationModelAssembler.toModel(stopTime.getStop()));
+        stopTimeDto.setArrivalTime(stopTime.getArrivalTime());
+        stopTimeDto.setDepartureTime(stopTime.getDepartureTime());
+        return stopTimeDto;
     }
 
     public StopTime requestToEntity(StopTimeRequest stopTimeRequest) {
@@ -49,18 +49,18 @@ public record StopTimeMapper(
                 });
     }
 
-    public StopTimeDTO requestToDTO(StopTimeRequest stopTimeRequest) {
-        log.info("Mapping StopTimeRequest to StopTimeDTO");
+    public StopTimeDto requestToDto(StopTimeRequest stopTimeRequest) {
+        log.info("Mapping StopTimeRequest to StopTimeDto");
 
         City city = findCityById(stopTimeRequest.getCityId());
-        CityDTO cityDTO = mapper.map(city, CityDTO.class);
+        CityDto cityDto = mapper.map(city, CityDto.class);
 
-        StopTimeDTO stopTimeDTO = new StopTimeDTO();
-        stopTimeDTO.setId(stopTimeRequest.getId());
-        stopTimeDTO.setCityDTO(cityDTO);
-        stopTimeDTO.setArrivalTime(stopTimeRequest.getArrivalTime());
-        stopTimeDTO.setDepartureTime(stopTimeRequest.getDepartureTime());
-        return stopTimeDTO;
+        StopTimeDto stopTimeDto = new StopTimeDto();
+        stopTimeDto.setId(stopTimeRequest.getId());
+        stopTimeDto.setCityDto(cityDto);
+        stopTimeDto.setArrivalTime(stopTimeRequest.getArrivalTime());
+        stopTimeDto.setDepartureTime(stopTimeRequest.getDepartureTime());
+        return stopTimeDto;
     }
 
     public StopTime idToEntity(Long id) {
@@ -75,9 +75,9 @@ public record StopTimeMapper(
         return stopTimeIds.stream().map(this::idToEntity).collect(Collectors.toList());
     }
 
-    public List<StopTimeDTO> idsToDTOs(List<Long> stopTimeIds) {
+    public List<StopTimeDto> idsToDtos(List<Long> stopTimeIds) {
         return stopTimeIds.stream().map(this::idToEntity).collect(Collectors.toList()).stream()
-                .map(this::entityToDTO)
+                .map(this::entityToDto)
                 .collect(Collectors.toList());
     }
 
@@ -85,11 +85,11 @@ public record StopTimeMapper(
         return stopTimeRequests.stream().map(this::requestToEntity).collect(Collectors.toList());
     }
 
-    public List<StopTimeDTO> entitiesToDTOs(List<StopTime> stopTimes) {
-        return stopTimes.stream().map(this::entityToDTO).collect(Collectors.toList());
+    public List<StopTimeDto> entitiesToDtos(List<StopTime> stopTimes) {
+        return stopTimes.stream().map(this::entityToDto).collect(Collectors.toList());
     }
 
-    public List<StopTimeDTO> requestToDTOs(List<StopTimeRequest> stopTimeRequests) {
-        return stopTimeRequests.stream().map(this::requestToDTO).collect(Collectors.toList());
+    public List<StopTimeDto> requestToDtos(List<StopTimeRequest> stopTimeRequests) {
+        return stopTimeRequests.stream().map(this::requestToDto).collect(Collectors.toList());
     }
 }

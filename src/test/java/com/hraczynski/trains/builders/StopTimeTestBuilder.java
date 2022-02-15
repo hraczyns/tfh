@@ -1,9 +1,9 @@
 package com.hraczynski.trains.builders;
 
 import com.hraczynski.trains.city.City;
-import com.hraczynski.trains.city.CityDTO;
+import com.hraczynski.trains.city.CityDto;
 import com.hraczynski.trains.stoptime.StopTime;
-import com.hraczynski.trains.stoptime.StopTimeDTO;
+import com.hraczynski.trains.stoptime.StopTimeDto;
 import com.hraczynski.trains.stoptime.StopTimeRequest;
 import com.hraczynski.trains.trip.Trip;
 import com.natpryce.makeiteasy.Instantiator;
@@ -11,7 +11,7 @@ import com.natpryce.makeiteasy.Property;
 
 import java.time.LocalDateTime;
 
-import static com.hraczynski.trains.builders.CityTestBuilder.BasicCityDTO;
+import static com.hraczynski.trains.builders.CityTestBuilder.BasicCityDto;
 import static com.hraczynski.trains.builders.CityTestBuilder.BasicCityEntity;
 import static com.natpryce.makeiteasy.MakeItEasy.a;
 import static com.natpryce.makeiteasy.MakeItEasy.make;
@@ -20,15 +20,15 @@ public class StopTimeTestBuilder {
     private static final Long ID = 11L;
     private static final City CITY = make(a(BasicCityEntity));
     private static final Long CITY_REQUEST = 11L;
-    private static final CityDTO CITY_DTO = make(a(BasicCityDTO));
+    private static final CityDto CITY_Dto = make(a(BasicCityDto));
     private static final Trip TRIP = new Trip();
     private static final LocalDateTime DEPARTURE_TIME = LocalDateTime.now();
     private static final LocalDateTime ARRIVAL_TIME = LocalDateTime.now().minusDays(3);
 
-    public static final Property<StopTimeDTO, Long> idDTO = Property.newProperty();
-    public static final Property<StopTimeDTO, CityDTO> cityDTO = Property.newProperty();
-    public static final Property<StopTimeDTO, LocalDateTime> depDTO = Property.newProperty();
-    public static final Property<StopTimeDTO, LocalDateTime> arrDTO = Property.newProperty();
+    public static final Property<StopTimeDto, Long> idDto = Property.newProperty();
+    public static final Property<StopTimeDto, CityDto> cityDto = Property.newProperty();
+    public static final Property<StopTimeDto, LocalDateTime> depDto = Property.newProperty();
+    public static final Property<StopTimeDto, LocalDateTime> arrDto = Property.newProperty();
 
     public static final Property<StopTimeRequest, Long> idRequest = Property.newProperty();
     public static final Property<StopTimeRequest, Long> cityRequest = Property.newProperty();
@@ -42,13 +42,13 @@ public class StopTimeTestBuilder {
     public static final Property<StopTime, LocalDateTime> arrEntity = Property.newProperty();
 
 
-    public static final Instantiator<StopTimeDTO> BasicStopTimeDTO = propertyLookup -> {
-        StopTimeDTO stopTimeDTO = new StopTimeDTO();
-        stopTimeDTO.setId(propertyLookup.valueOf(idDTO, ID));
-        stopTimeDTO.setCityDTO(propertyLookup.valueOf(cityDTO, CITY_DTO));
-        stopTimeDTO.setDepartureTime(propertyLookup.valueOf(depDTO, DEPARTURE_TIME));
-        stopTimeDTO.setArrivalTime(propertyLookup.valueOf(arrDTO, ARRIVAL_TIME));
-        return stopTimeDTO;
+    public static final Instantiator<StopTimeDto> BasicStopTimeDto = propertyLookup -> {
+        StopTimeDto stopTimeDto = new StopTimeDto();
+        stopTimeDto.setId(propertyLookup.valueOf(idDto, ID));
+        stopTimeDto.setCityDto(propertyLookup.valueOf(cityDto, CITY_Dto));
+        stopTimeDto.setDepartureTime(propertyLookup.valueOf(depDto, DEPARTURE_TIME));
+        stopTimeDto.setArrivalTime(propertyLookup.valueOf(arrDto, ARRIVAL_TIME));
+        return stopTimeDto;
     };
 
     public static final Instantiator<StopTimeRequest> BasicStopTimeRequest = propertyLookup -> {

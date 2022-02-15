@@ -6,7 +6,7 @@ import com.hraczynski.trains.algorithm.algorithmentities.RouteSection;
 import com.hraczynski.trains.algorithm.algorithmentities.TimetableRouteSection;
 import com.hraczynski.trains.city.City;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
-import com.hraczynski.trains.journey.JourneyDTO;
+import com.hraczynski.trains.journey.JourneyDto;
 import com.hraczynski.trains.journey.JourneyRepresentationModelAssembler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,12 +26,12 @@ public class RouteFinderServiceImpl implements RouteFinderService {
     private final JourneyRepresentationModelAssembler assembler;
 
     @Override
-    public CollectionModel<JourneyDTO> findRoute(Long sourceId, Long destinationId, LocalDateTime startFindingTime) {
+    public CollectionModel<JourneyDto> findRoute(Long sourceId, Long destinationId, LocalDateTime startFindingTime) {
         return assembler.toCollectionModel(routeFinderRaptor.findRoute(sourceId, destinationId, startFindingTime));
     }
 
     @Override
-    public CollectionModel<JourneyDTO> findManyRoutes(Long sourceId, Long destinationId, LocalDateTime startFindingTime, int results) {
+    public CollectionModel<JourneyDto> findManyRoutes(Long sourceId, Long destinationId, LocalDateTime startFindingTime, int results) {
         AtomicInteger id = new AtomicInteger(1);
         List<Journey> route = routeFinderRaptor.findRoute(sourceId, destinationId, startFindingTime)
                 .stream()
@@ -59,7 +59,7 @@ public class RouteFinderServiceImpl implements RouteFinderService {
     }
 
 //    @Override
-//    public CollectionModel<JourneyDTO> findManyRoutes(Long sourceId, Long destinationId, LocalDateTime startFindingTime, int results) {
+//    public CollectionModel<JourneyDto> findManyRoutes(Long sourceId, Long destinationId, LocalDateTime startFindingTime, int results) {
 //
 //        List<LocalDateTime> arrivalDatesByNumberOfResultsAndCity = getArrivalDatesByNumberOfResultsAndCity(sourceId, results, startFindingTime);
 //        List<Journey> resultFromAlgorithm;

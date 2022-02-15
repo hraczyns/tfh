@@ -6,17 +6,25 @@ import java.math.BigDecimal;
 import java.util.Map;
 
 public interface ReservationService {
-    CollectionModel<ReservationDTO> getAll();
+    CollectionModel<ReservationDto> getAll();
 
-    ReservationDTO getById(Long id);
+    ReservationDto getById(Long id);
 
-    ReservationDTO deleteById(Long id);
+    ReservationDto deleteById(Long id);
 
-    ReservationDTO updateById(ReservationRequest request);
+    ReservationDto updateById(ReservationRequest request);
 
-    ReservationDTO patchById(ReservationRequest request);
+    ReservationDto patchById(ReservationRequest request);
 
-    ReservationDTO addReservation(ReservationRequest request);
+    ReservationDto addReservation(ReservationRequest request);
 
-    Map<String,Double> getPossibleDiscounts();
+    ReservationDto addReservation(ReservationRequest reservationRequest, BigDecimal sumFromReservation);
+
+    Map<String, Double> getPossibleDiscounts();
+
+    Reservation getEntityById(Long id);
+
+    void updateStatus(Reservation reservation, ReservationStatus status);
+
+    Object getContent(String paymentContentId);
 }

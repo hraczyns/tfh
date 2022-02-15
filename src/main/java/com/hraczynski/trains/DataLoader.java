@@ -1,15 +1,15 @@
 //package com.hraczynski.trains;
 //
-//import com.hraczynski.trains.city.CityDTO;
+//import com.hraczynski.trains.city.CityDto;
 //import com.hraczynski.trains.city.CityRequest;
-//import com.hraczynski.trains.journey.JourneyDTO;
+//import com.hraczynski.trains.journey.JourneyDto;
 //import com.hraczynski.trains.journey.JourneyRepresentationModelAssembler;
 //import com.hraczynski.trains.passengers.*;
 //import com.hraczynski.trains.payment.Discount;
 //import com.hraczynski.trains.reservations.ReservationRequest;
 //import com.hraczynski.trains.reservations.ReservationService;
 //import com.hraczynski.trains.routefinder.RouteFinderService;
-//import com.hraczynski.trains.stoptime.StopTimeDTO;
+//import com.hraczynski.trains.stoptime.StopTimeDto;
 //import com.hraczynski.trains.stoptime.StopTimeRequest;
 //import com.hraczynski.trains.train.TrainService;
 //import org.springframework.beans.factory.annotation.Autowired;
@@ -48,42 +48,42 @@
 //
 //    @Override
 //    public void run(ApplicationArguments args) throws IOException {
-////        CollectionModel<TrainDTO> all = null;
+////        CollectionModel<TrainDto> all = null;
 ////        try {
 //////            all = trainService.getAll();
 ////        } catch (Exception ignored) {
 ////        }
 ////
 //////        if (all == null || all.getContent().isEmpty()) {
-//////            TrainDTO trainDTO = new TrainDTO();
-//////            trainDTO.setId(1L);
-//////            trainDTO.setArrivalTime(LocalDateTime.of(2020, 5, 12, 12, 32));
-//////            trainDTO.setDepartureTime(LocalDateTime.of(2021, 5, 12, 12, 32));
-//////            trainDTO.setNumberOfSeats(30);
-//////            trainDTO.setPrice(100);
-//////            trainDTO.setSource(1L);
-//////            trainDTO.setDestination(2L);
-//////            trainService.save(trainDTO);
+//////            TrainDto trainDto = new TrainDto();
+//////            trainDto.setId(1L);
+//////            trainDto.setArrivalTime(LocalDateTime.of(2020, 5, 12, 12, 32));
+//////            trainDto.setDepartureTime(LocalDateTime.of(2021, 5, 12, 12, 32));
+//////            trainDto.setNumberOfSeats(30);
+//////            trainDto.setPrice(100);
+//////            trainDto.setSource(1L);
+//////            trainDto.setDestination(2L);
+//////            trainService.save(trainDto);
 //////        }
 ////
-////        CollectionModel<PassengerDTO> all1 = null;
+////        CollectionModel<PassengerDto> all1 = null;
 ////        try {
 ////            all1 = passengerService.getAll();
 ////        } catch (Exception ignored) {
 ////        }
 ////
 ////        if (all1 == null || all1.getContent().isEmpty()) {
-////            PassengerDTO passengerDTO = new PassengerDTO();
-////            passengerDTO.setId(1L);
-////            passengerDTO.setNotes("Some notes");
-////            passengerDTO.setSurname("Kowalski");
-////            passengerDTO.setName("Jan");
-////            passengerDTO.setCountry("Poland");
-////            passengerDTO.setGender("male");
-////            passengerDTO.setBornDate(LocalDate.now());
-////            passengerService.save(passengerDTO);
+////            PassengerDto passengerDto = new PassengerDto();
+////            passengerDto.setId(1L);
+////            passengerDto.setNotes("Some notes");
+////            passengerDto.setSurname("Kowalski");
+////            passengerDto.setName("Jan");
+////            passengerDto.setCountry("Poland");
+////            passengerDto.setGender("male");
+////            passengerDto.setBornDate(LocalDate.now());
+////            passengerService.save(passengerDto);
 ////        }
-////        CollectionModel<ReservationDTO> all2 = null;
+////        CollectionModel<ReservationDto> all2 = null;
 ////
 ////        try {
 ////            all2 = reservationService.getAll();
@@ -91,26 +91,26 @@
 ////        }
 ////
 ////        if (all2 == null || all2.getContent().isEmpty()) {
-////            CollectionModel<TrainDTO> trainDTOS = null;
+////            CollectionModel<TrainDto> trainDtoS = null;
 ////
 ////            try {
-//////                trainDTOS = trainService.getAll();
+//////                trainDtoS = trainService.getAll();
 ////            } catch (Exception ignored) {
 ////            }
 ////
-//////            assert trainDTOS != null;
+//////            assert trainDtoS != null;
 ////
-//////            Optional<TrainDTO> flightDTO = trainDTOS.getContent().stream().findAny();
-//        CollectionModel<PassengerDTO> passengerDTOS = null;
+//////            Optional<TrainDto> flightDto = trainDtoS.getContent().stream().findAny();
+//        CollectionModel<PassengerDto> passengerDtoS = null;
 //
 //        try {
-//            passengerDTOS = passengerService.getAll();
+//            passengerDtoS = passengerService.getAll();
 //        } catch (Exception ignored) {
 //        }
 //
-////        assert passengerDTOS != null;
+////        assert passengerDtoS != null;
 //
-////        Optional<PassengerDTO> passengerDTO = passengerDTOS.getContent().stream().findAny();
+////        Optional<PassengerDto> passengerDto = passengerDtoS.getContent().stream().findAny();
 //        PassengerRequest passengerRequest = new PassengerRequest();
 //        passengerRequest.setName("asd");
 //        passengerRequest.setSurname("naziwkso");
@@ -134,15 +134,15 @@
 //        passengerService.addPassenger(passengerRequest2);
 //
 //        try {
-//            passengerDTOS = passengerService.getAll();
+//            passengerDtoS = passengerService.getAll();
 //        } catch (Exception ignored) {
 //        }
 //
-//        CollectionModel<JourneyDTO> route = routeFinderService.findRoute(1L, 14L, LocalDateTime.of(2021, 3, 16, 14, 23));
-//        List<StopTimeRequest> stopTimeDTOS = parseRoute(route);
+//        CollectionModel<JourneyDto> route = routeFinderService.findRoute(1L, 14L, LocalDateTime.of(2021, 3, 16, 14, 23));
+//        List<StopTimeRequest> stopTimeDtoS = parseRoute(route);
 //        ReservationRequest reservationRequest = new ReservationRequest();
 //        reservationRequest.setId(1L);
-//        reservationRequest.setReservedRoute(stopTimeDTOS.stream().map(StopTimeRequest::getId).collect(Collectors.toList()));
+//        reservationRequest.setReservedRoute(stopTimeDtoS.stream().map(StopTimeRequest::getId).collect(Collectors.toList()));
 //        reservationRequest.setIdPassengersWithDiscounts(Set.of(
 //                new PassengerWithDiscount().setPassengerId(1L).setDiscountCode("S"),
 //                new PassengerWithDiscount().setPassengerId(2L),
@@ -150,7 +150,7 @@
 //        ));
 //        reservationService.addReservation(reservationRequest);
 //
-//        CollectionModel<JourneyDTO> route2 = routeFinderService.findRoute(1L, 14L, LocalDateTime.of(2021, 3, 16, 14, 23));
+//        CollectionModel<JourneyDto> route2 = routeFinderService.findRoute(1L, 14L, LocalDateTime.of(2021, 3, 16, 14, 23));
 //        List<StopTimeRequest> parsed2 = parseRoute(route2);
 //        ReservationRequest dto2 = new ReservationRequest();
 //        dto2.setId(2L);
@@ -163,46 +163,46 @@
 //        ));
 //        reservationService.addReservation(dto2);
 //
-////                    passengerDTO.ifPresent(s -> dto.setIdTourist(s.getId()));
-////            flightDTO.ifPresent(s -> dto.setIdFlight(s.getId()));
+////                    passengerDto.ifPresent(s -> dto.setIdTourist(s.getId()));
+////            flightDto.ifPresent(s -> dto.setIdFlight(s.getId()));
 ////            reservationService.addReservation(dto);
 ////        }
 ////
 ////        stopQueries.generate();
 //    }
 //
-//    private List<StopTimeRequest> parseRoute(CollectionModel<JourneyDTO> route) {
-//        List<StopTimeDTO> stopTimeDTOS = new ArrayList<>();
-//        List<JourneyDTO> content = new ArrayList<>(route.getContent());
+//    private List<StopTimeRequest> parseRoute(CollectionModel<JourneyDto> route) {
+//        List<StopTimeDto> stopTimeDtoS = new ArrayList<>();
+//        List<JourneyDto> content = new ArrayList<>(route.getContent());
 //        List<JourneyRepresentationModelAssembler.PartOfJourney> partOfJourneys = content.get(0).getPartOfJourneys();
 //        for (JourneyRepresentationModelAssembler.PartOfJourney partOfJourney : partOfJourneys) {
 //            JourneyRepresentationModelAssembler.PartOfJourneyTimeTable partOfJourneyTimeTable = (JourneyRepresentationModelAssembler.PartOfJourneyTimeTable) partOfJourney;
-//            StopTimeDTO start = partOfJourneyTimeTable.start();
-//            StopTimeDTO end = partOfJourneyTimeTable.end();
-//            if (stopTimeDTOS.stream().noneMatch(stopTimeDTO -> stopTimeDTO.getId().equals(start.getId()))) {
-//                stopTimeDTOS.add(start);
+//            StopTimeDto start = partOfJourneyTimeTable.start();
+//            StopTimeDto end = partOfJourneyTimeTable.end();
+//            if (stopTimeDtoS.stream().noneMatch(stopTimeDto -> stopTimeDto.getId().equals(start.getId()))) {
+//                stopTimeDtoS.add(start);
 //            }
 //
-//            if (stopTimeDTOS.stream().noneMatch(stopTimeDTO -> stopTimeDTO.getId().equals(end.getId()))) {
-//                stopTimeDTOS.add(end);
+//            if (stopTimeDtoS.stream().noneMatch(stopTimeDto -> stopTimeDto.getId().equals(end.getId()))) {
+//                stopTimeDtoS.add(end);
 //            }
 //        }
 //
-//        return stopTimeDTOS.stream()
+//        return stopTimeDtoS.stream()
 //                .map(s -> {
 //                    StopTimeRequest request = new StopTimeRequest();
 //                    request.setId(s.getId());
 //                    request.setArrivalTime(s.getArrivalTime());
 //                    request.setDepartureTime(s.getDepartureTime());
 //
-//                    CityDTO cityDTO = s.getCityDTO();
+//                    CityDto cityDto = s.getCityDto();
 ////                    CityRequest cityRequest = new CityRequest();
-////                    cityRequest.setId(cityDTO.getId());
-////                    cityRequest.setCountry(cityDTO.getCountry());
-////                    cityRequest.setLat(cityDTO.getLat());
-////                    cityRequest.setLon(cityDTO.getLon());
-////                    cityRequest.setName(cityDTO.getName());
-//                    request.setCityId(cityDTO.getId());
+////                    cityRequest.setId(cityDto.getId());
+////                    cityRequest.setCountry(cityDto.getCountry());
+////                    cityRequest.setLat(cityDto.getLat());
+////                    cityRequest.setLon(cityDto.getLon());
+////                    cityRequest.setName(cityDto.getName());
+//                    request.setCityId(cityDto.getId());
 //                    return request;
 //                }).collect(Collectors.toList());
 //    }

@@ -13,38 +13,37 @@ import java.util.Set;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "api/cities", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-@CrossOrigin(origins = "http://localhost:3006")
 public class CityController {
     private final CityService cityService;
     private final CityRepresentationModelAssembler assembler;
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<CityDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<CityDto> findById(@PathVariable Long id) {
         City byId = cityService.findById(id);
-        CityDTO cityDTO = assembler.toModel(byId);
-        return new ResponseEntity<>(cityDTO, HttpStatus.OK);
+        CityDto cityDto = assembler.toModel(byId);
+        return new ResponseEntity<>(cityDto, HttpStatus.OK);
     }
 
 
     @GetMapping("/all")
-    public ResponseEntity<CollectionModel<CityDTO>> findAll() {
+    public ResponseEntity<CollectionModel<CityDto>> findAll() {
         Set<City> all = cityService.findAll();
-        CollectionModel<CityDTO> dtos = assembler.toCollectionModel(all);
+        CollectionModel<CityDto> dtos = assembler.toCollectionModel(all);
         return new ResponseEntity<>(dtos, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<CityDTO> addCity(@Valid @RequestBody CityRequest request) {
+    public ResponseEntity<CityDto> addCity(@Valid @RequestBody CityRequest request) {
         City save = cityService.save(request);
-        CityDTO cityDTO = assembler.toModel(save);
-        return new ResponseEntity<>(cityDTO, HttpStatus.CREATED);
+        CityDto cityDto = assembler.toModel(save);
+        return new ResponseEntity<>(cityDto, HttpStatus.CREATED);
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<CityDTO> deleteById(@PathVariable Long id) {
+    public ResponseEntity<CityDto> deleteById(@PathVariable Long id) {
         City city = cityService.deleteById(id);
-        CityDTO cityDTO = assembler.toModel(city);
-        return new ResponseEntity<>(cityDTO, HttpStatus.OK);
+        CityDto cityDto = assembler.toModel(city);
+        return new ResponseEntity<>(cityDto, HttpStatus.OK);
     }
 
     @PutMapping

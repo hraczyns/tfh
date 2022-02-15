@@ -8,7 +8,7 @@ import org.springframework.hateoas.RepresentationModel;
 @Getter
 @Setter
 @ToString
-public class TrainDTO extends RepresentationModel<TrainDTO> {
+public class TrainDto extends RepresentationModel<TrainDto> {
     private Long id;
     private TrainType model;
     private String name;

@@ -20,40 +20,39 @@ import java.util.Set;
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/trains", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE, "images/svg+xml"})
 @Slf4j
-@CrossOrigin(origins = "http://localhost:3006")
 public class TrainController {
     private final TrainService trainService;
     private final TripService tripService;
     private final TrainRepresentationModelAssembler assembler;
 
     @GetMapping(value = "/all")
-    public ResponseEntity<CollectionModel<TrainDTO>> findAll() {
+    public ResponseEntity<CollectionModel<TrainDto>> findAll() {
         Set<Train> trains = trainService.findAll();
-        CollectionModel<TrainDTO> collectionModel = assembler.toCollectionModel(trains);
+        CollectionModel<TrainDto> collectionModel = assembler.toCollectionModel(trains);
         collectionModel.forEach(this::specifyUsedParameter);
         return new ResponseEntity<>(collectionModel, HttpStatus.OK);
     }
 
     @GetMapping
-    public ResponseEntity<TrainDTO> findById(@RequestParam("id") Long id) {
+    public ResponseEntity<TrainDto> findById(@RequestParam("id") Long id) {
         Train train = trainService.findById(id);
-        TrainDTO trainDTO = assembler.toModel(train);
-        specifyUsedParameter(trainDTO);
-        return new ResponseEntity<>(trainDTO, HttpStatus.OK);
+        TrainDto trainDto = assembler.toModel(train);
+        specifyUsedParameter(trainDto);
+        return new ResponseEntity<>(trainDto, HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<TrainDTO> addTrain(@Valid @RequestBody TrainRequest trainRequest) {
+    public ResponseEntity<TrainDto> addTrain(@Valid @RequestBody TrainRequest trainRequest) {
         Train saved = trainService.save(trainRequest);
         return new ResponseEntity<>(assembler.toModel(saved), HttpStatus.CREATED);
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<TrainDTO> deleteById(@PathVariable Long id) {
+    public ResponseEntity<TrainDto> deleteById(@PathVariable Long id) {
         Train train = trainService.deleteById(id);
-        TrainDTO trainDTO = assembler.toModel(train);
-        specifyUsedParameter(trainDTO);
-        return new ResponseEntity<>(trainDTO, HttpStatus.OK);
+        TrainDto trainDto = assembler.toModel(train);
+        specifyUsedParameter(trainDto);
+        return new ResponseEntity<>(trainDto, HttpStatus.OK);
     }
 
     @PutMapping
@@ -92,16 +91,16 @@ public class TrainController {
         return headers;
     }
 
-    private void specifyUsedParameter(TrainDTO trainDTO) {
-        log.info("Looking for Trips by train id = {}", trainDTO.getId());
+    private void specifyUsedParameter(TrainDto trainDto) {
+        log.info("Looking for Trips by train id = {}", trainDto.getId());
         Set<Trip> tripsByTrainId;
         try {
-            tripsByTrainId = tripService.getTripsByTrainId(trainDTO.getId());
+            tripsByTrainId = tripService.getTripsByTrainId(trainDto.getId());
         } catch (EntityNotFoundException e) {
             tripsByTrainId = null;
         }
         if (tripsByTrainId != null && !tripsByTrainId.isEmpty()) {
-            trainDTO.setUsed(true);
+            trainDto.setUsed(true);
         }
     }
 

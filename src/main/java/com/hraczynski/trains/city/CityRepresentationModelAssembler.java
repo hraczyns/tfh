@@ -11,29 +11,29 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
 @Slf4j
-public class CityRepresentationModelAssembler extends RepresentationModelAssemblerSupport<City, CityDTO> {
+public class CityRepresentationModelAssembler extends RepresentationModelAssemblerSupport<City, CityDto> {
 
     private final ModelMapper mapper;
 
     public CityRepresentationModelAssembler(ModelMapper mapper) {
-        super(CityController.class, CityDTO.class);
+        super(CityController.class, CityDto.class);
         this.mapper = mapper;
     }
 
     @Override
-    public CityDTO toModel(City entity) {
+    public CityDto toModel(City entity) {
         log.info("Transforming City into model");
-        CityDTO cityDTO = instantiateModel(entity);
-        mapper.map(entity, cityDTO);
-        cityDTO.setCountry(entity.getCountry().getName());
-        cityDTO.add(linkTo(methodOn(CityController.class).findById(entity.getId())).withSelfRel());
-        return cityDTO;
+        CityDto cityDto = instantiateModel(entity);
+        mapper.map(entity, cityDto);
+        cityDto.setCountry(entity.getCountry().getName());
+        cityDto.add(linkTo(methodOn(CityController.class).findById(entity.getId())).withSelfRel());
+        return cityDto;
     }
 
     @Override
-    public CollectionModel<CityDTO> toCollectionModel(Iterable<? extends City> entities) {
-        CollectionModel<CityDTO> cityDTOS = super.toCollectionModel(entities);
-        cityDTOS.add(linkTo(methodOn(CityController.class).findAll()).withSelfRel());
-        return cityDTOS;
+    public CollectionModel<CityDto> toCollectionModel(Iterable<? extends City> entities) {
+        CollectionModel<CityDto> cityDtoS = super.toCollectionModel(entities);
+        cityDtoS.add(linkTo(methodOn(CityController.class).findAll()).withSelfRel());
+        return cityDtoS;
     }
 }

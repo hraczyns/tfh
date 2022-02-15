@@ -53,16 +53,16 @@ class PassengerControllerTest {
     void findById() {
         //given
         Passenger passenger = givenEntity();
-        PassengerDTO passengerDTO = givenDTO();
+        PassengerDto passengerDto = givenDto();
         when(passengerService.getById(anyLong())).thenReturn(passenger);
-        when(assembler.toModel(passenger)).thenReturn(passengerDTO);
+        when(assembler.toModel(passenger)).thenReturn(passengerDto);
 
         //when
-        ResponseEntity<PassengerDTO> responseEntity = controller.getById(passenger.getId());
+        ResponseEntity<PassengerDto> responseEntity = controller.getById(passenger.getId());
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody()).isEqualTo(passengerDTO);
+        assertThat(responseEntity.getBody()).isEqualTo(passengerDto);
         verify(passengerService).getById(passenger.getId());
         verifyAssembler(passenger);
     }
@@ -73,12 +73,12 @@ class PassengerControllerTest {
     void findAll() {
         //given
         Set<Passenger> passengers = preparedSet();
-        CollectionModel<PassengerDTO> collectionModel = preparedCollectionModel();
+        CollectionModel<PassengerDto> collectionModel = preparedCollectionModel();
         when(passengerService.getAll()).thenReturn(passengers);
         when(assembler.toCollectionModel(passengers)).thenReturn(collectionModel);
 
         //when
-        ResponseEntity<CollectionModel<PassengerDTO>> all = controller.getAll();
+        ResponseEntity<CollectionModel<PassengerDto>> all = controller.getAll();
 
         //then
         assertThat(all.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -93,17 +93,17 @@ class PassengerControllerTest {
     void deleteById() {
         //given
         Passenger passenger = givenEntity();
-        PassengerDTO passengerDTO = givenDTO();
-        when(passengerService.deleteById(passengerDTO.getId())).thenReturn(passenger);
-        when(assembler.toModel(passenger)).thenReturn(passengerDTO);
+        PassengerDto passengerDto = givenDto();
+        when(passengerService.deleteById(passengerDto.getId())).thenReturn(passenger);
+        when(assembler.toModel(passenger)).thenReturn(passengerDto);
 
         //when
-        ResponseEntity<PassengerDTO> responseEntity = controller.deleteById(passengerDTO.getId());
+        ResponseEntity<PassengerDto> responseEntity = controller.deleteById(passengerDto.getId());
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody()).isEqualTo(passengerDTO);
-        verify(passengerService).deleteById(passengerDTO.getId());
+        assertThat(responseEntity.getBody()).isEqualTo(passengerDto);
+        verify(passengerService).deleteById(passengerDto.getId());
         verifyAssembler(passenger);
     }
 
@@ -144,17 +144,17 @@ class PassengerControllerTest {
     void savePassenger() {
         //given
         Passenger passenger = givenEntity();
-        PassengerDTO passengerDTO = givenDTO();
+        PassengerDto passengerDto = givenDto();
         PassengerRequest passengerRequest = givenRequest();
         when(passengerService.addPassenger(passengerRequest)).thenReturn(passenger);
-        when(assembler.toModel(passenger)).thenReturn(passengerDTO);
+        when(assembler.toModel(passenger)).thenReturn(passengerDto);
 
         //when
-        ResponseEntity<PassengerDTO> responseEntity = controller.addPassenger(passengerRequest);
+        ResponseEntity<PassengerDto> responseEntity = controller.addPassenger(passengerRequest);
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(responseEntity.getBody()).isEqualTo(passengerDTO);
+        assertThat(responseEntity.getBody()).isEqualTo(passengerDto);
 
         verify(passengerService).addPassenger(argumentCaptor.capture());
         assertThat(passengerRequest).isEqualTo(argumentCaptor.getValue());
@@ -221,12 +221,12 @@ class PassengerControllerTest {
         }
     }
 
-    private CollectionModel<PassengerDTO> preparedCollectionModel() {
-        return CollectionModel.of(Collections.singletonList(givenDTO()));
+    private CollectionModel<PassengerDto> preparedCollectionModel() {
+        return CollectionModel.of(Collections.singletonList(givenDto()));
     }
 
-    private PassengerDTO givenDTO() {
-        return make(a(BasicPassengerDTO));
+    private PassengerDto givenDto() {
+        return make(a(BasicPassengerDto));
     }
 
     private PassengerRequest givenRequest() {

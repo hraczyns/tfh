@@ -13,32 +13,31 @@ import java.util.Set;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(value = "/api/passengers", produces = {MediaType.APPLICATION_JSON_VALUE, MediaType.APPLICATION_XML_VALUE})
-public
-class PassengerController {
+public class PassengerController {
 
     private final PassengerService passengerService;
     private final PassengerRepresentationModelAssembler assembler;
 
     @GetMapping(value = "/all")
-    public ResponseEntity<CollectionModel<PassengerDTO>> getAll() {
+    public ResponseEntity<CollectionModel<PassengerDto>> getAll() {
         Set<Passenger> all = passengerService.getAll();
         return new ResponseEntity<>(assembler.toCollectionModel(all), HttpStatus.OK);
     }
 
     @GetMapping(path = "/{id}")
-    public ResponseEntity<PassengerDTO> getById(@PathVariable Long id) {
+    public ResponseEntity<PassengerDto> getById(@PathVariable Long id) {
         Passenger entity = passengerService.getById(id);
         return new ResponseEntity<>(assembler.toModel(entity), HttpStatus.OK);
     }
 
     @PostMapping
-    public ResponseEntity<PassengerDTO> addPassenger(@Valid @RequestBody PassengerRequest request) {
+    public ResponseEntity<PassengerDto> addPassenger(@Valid @RequestBody PassengerRequest request) {
         Passenger saved = passengerService.addPassenger(request);
         return new ResponseEntity<>(assembler.toModel(saved), HttpStatus.CREATED);
     }
 
     @DeleteMapping(path = "/{id}")
-    public ResponseEntity<PassengerDTO> deleteById(@PathVariable Long id) {
+    public ResponseEntity<PassengerDto> deleteById(@PathVariable Long id) {
         Passenger passenger = passengerService.deleteById(id);
         return new ResponseEntity<>(assembler.toModel(passenger), HttpStatus.OK);
     }

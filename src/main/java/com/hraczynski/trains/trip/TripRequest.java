@@ -12,5 +12,5 @@ import java.util.List;
 @ToString
 public class TripRequest {
     private Long id;
-    private List<StopTimeRequest> stopTimeDTOList;
+    private List<StopTimeRequest> stopTimeDtoList;
 }

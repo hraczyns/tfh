@@ -13,19 +13,19 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
 @Slf4j
-public class TrainRepresentationModelAssembler extends RepresentationModelAssemblerSupport<Train, TrainDTO> {
+public class TrainRepresentationModelAssembler extends RepresentationModelAssemblerSupport<Train, TrainDto> {
     private final ModelMapper mapper;
 
     @Autowired
     public TrainRepresentationModelAssembler(ModelMapper mapper) {
-        super(TrainController.class, TrainDTO.class);
+        super(TrainController.class, TrainDto.class);
         this.mapper = mapper;
     }
 
     @Override
-    public TrainDTO toModel(Train entity) {
+    public TrainDto toModel(Train entity) {
         log.info("Transforming Train into model");
-        TrainDTO model = instantiateModel(entity);
+        TrainDto model = instantiateModel(entity);
         mapper.map(entity, model);
         model.add(linkTo(methodOn(TrainController.class).findById(entity.getId())).withSelfRel());
         model.add(linkTo(methodOn(TrainController.class).findAll()).withRel("all"));
@@ -33,9 +33,9 @@ public class TrainRepresentationModelAssembler extends RepresentationModelAssemb
         return model;
     }
 
-    public CollectionModel<TrainDTO> toCollectionModel(Iterable<? extends Train> entities) {
-        CollectionModel<TrainDTO> flightDTOS = super.toCollectionModel(entities);
-        flightDTOS.add(linkTo(methodOn(TrainController.class).findAll()).withSelfRel());
-        return flightDTOS;
+    public CollectionModel<TrainDto> toCollectionModel(Iterable<? extends Train> entities) {
+        CollectionModel<TrainDto> trainDtoS = super.toCollectionModel(entities);
+        trainDtoS.add(linkTo(methodOn(TrainController.class).findAll()).withSelfRel());
+        return trainDtoS;
     }
 }

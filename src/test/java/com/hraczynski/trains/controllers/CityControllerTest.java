@@ -51,16 +51,16 @@ class CityControllerTest {
     void findById() {
         //given
         City city = givenCity();
-        CityDTO cityDTO = givenDTO();
+        CityDto cityDto = givenDto();
         when(cityService.findById(anyLong())).thenReturn(city);
-        when(assembler.toModel(city)).thenReturn(cityDTO);
+        when(assembler.toModel(city)).thenReturn(cityDto);
 
         //when
-        ResponseEntity<CityDTO> responseEntity = controller.findById(city.getId());
+        ResponseEntity<CityDto> responseEntity = controller.findById(city.getId());
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody()).isEqualTo(cityDTO);
+        assertThat(responseEntity.getBody()).isEqualTo(cityDto);
         verify(cityService).findById(city.getId());
         verifyAssembler(city);
     }
@@ -83,12 +83,12 @@ class CityControllerTest {
     void findAll() {
         //given
         Set<City> citySet = givenCitySet();
-        CollectionModel<CityDTO> collectionModel = givenCollectionModel();
+        CollectionModel<CityDto> collectionModel = givenCollectionModel();
         when(cityService.findAll()).thenReturn(citySet);
         when(assembler.toCollectionModel(citySet)).thenReturn(collectionModel);
 
         //when
-        ResponseEntity<CollectionModel<CityDTO>> all = controller.findAll();
+        ResponseEntity<CollectionModel<CityDto>> all = controller.findAll();
 
         //then
         assertThat(all.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -116,16 +116,16 @@ class CityControllerTest {
     void deleteById() {
         //given
         City city = givenCity();
-        CityDTO cityDTO = givenDTO();
+        CityDto cityDto = givenDto();
         when(cityService.deleteById(city.getId())).thenReturn(city);
-        when(assembler.toModel(city)).thenReturn(cityDTO);
+        when(assembler.toModel(city)).thenReturn(cityDto);
 
         //when
-        ResponseEntity<CityDTO> responseEntity = controller.deleteById(city.getId());
+        ResponseEntity<CityDto> responseEntity = controller.deleteById(city.getId());
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody()).isEqualTo(cityDTO);
+        assertThat(responseEntity.getBody()).isEqualTo(cityDto);
         verify(cityService).deleteById(city.getId());
         verifyAssembler(city);
     }
@@ -180,18 +180,18 @@ class CityControllerTest {
     @DisplayName("Save city")
     void saveCity() {
         //given
-        CityDTO cityDTO = givenDTO();
+        CityDto cityDto = givenDto();
         City city = givenCity();
         CityRequest cityRequest = givenRequest();
         when(cityService.save(cityRequest)).thenReturn(city);
-        when(assembler.toModel(city)).thenReturn(cityDTO);
+        when(assembler.toModel(city)).thenReturn(cityDto);
 
         //when
-        ResponseEntity<CityDTO> responseEntity = controller.addCity(cityRequest);
+        ResponseEntity<CityDto> responseEntity = controller.addCity(cityRequest);
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(responseEntity.getBody()).isEqualTo(cityDTO);
+        assertThat(responseEntity.getBody()).isEqualTo(cityDto);
 
         verify(cityService).save(argumentCaptor.capture());
         assertThat(cityRequest).isEqualTo(argumentCaptor.getValue());
@@ -226,12 +226,12 @@ class CityControllerTest {
         verify(assembler).toCollectionModel(cities);
     }
 
-    private CollectionModel<CityDTO> givenCollectionModel() {
-        return CollectionModel.of(Collections.singletonList(givenDTO()));
+    private CollectionModel<CityDto> givenCollectionModel() {
+        return CollectionModel.of(Collections.singletonList(givenDto()));
     }
 
-    private CityDTO givenDTO() {
-        return make(a(BasicCityDTO));
+    private CityDto givenDto() {
+        return make(a(BasicCityDto));
     }
 
     private CityRequest givenRequest() {

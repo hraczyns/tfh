@@ -1,7 +1,7 @@
 package com.hraczynski.trains.builders;
 
 import com.hraczynski.trains.city.City;
-import com.hraczynski.trains.city.CityDTO;
+import com.hraczynski.trains.city.CityDto;
 import com.hraczynski.trains.city.CityRequest;
 import com.hraczynski.trains.country.Country;
 import com.natpryce.makeiteasy.Instantiator;
@@ -20,11 +20,11 @@ public abstract class CityTestBuilder {
     private static final double LAT = 31.0;
     private static final Country COUNTRY_OBJECT = new Country(1L, COUNTRY_STRING);
 
-    public static final Property<CityDTO, String> nameDTO = Property.newProperty();
-    public static final Property<CityDTO, String> countryDTO = Property.newProperty();
-    public static final Property<CityDTO, Long> idDTO = Property.newProperty();
-    public static final Property<CityDTO, Double> lonDTO = Property.newProperty();
-    public static final Property<CityDTO, Double> latDTO = Property.newProperty();
+    public static final Property<CityDto, String> nameDto = Property.newProperty();
+    public static final Property<CityDto, String> countryDto = Property.newProperty();
+    public static final Property<CityDto, Long> idDto = Property.newProperty();
+    public static final Property<CityDto, Double> lonDto = Property.newProperty();
+    public static final Property<CityDto, Double> latDto = Property.newProperty();
 
     public static final Property<CityRequest, String> nameRequest = Property.newProperty();
     public static final Property<CityRequest, String> countryRequest = Property.newProperty();
@@ -39,14 +39,14 @@ public abstract class CityTestBuilder {
     public static final Property<City, Double> latEntity = Property.newProperty();
 
 
-    public static final Instantiator<CityDTO> BasicCityDTO = propertyLookup -> {
-        CityDTO cityDTO = new CityDTO();
-        cityDTO.setCountry(propertyLookup.valueOf(countryDTO, COUNTRY_STRING));
-        cityDTO.setName(propertyLookup.valueOf(nameDTO, NAME));
-        cityDTO.setId(propertyLookup.valueOf(idDTO, ID));
-        cityDTO.setLat(propertyLookup.valueOf(latDTO, LAT));
-        cityDTO.setLon(propertyLookup.valueOf(lonDTO, LON));
-        return cityDTO;
+    public static final Instantiator<CityDto> BasicCityDto = propertyLookup -> {
+        CityDto cityDto = new CityDto();
+        cityDto.setCountry(propertyLookup.valueOf(countryDto, COUNTRY_STRING));
+        cityDto.setName(propertyLookup.valueOf(nameDto, NAME));
+        cityDto.setId(propertyLookup.valueOf(idDto, ID));
+        cityDto.setLat(propertyLookup.valueOf(latDto, LAT));
+        cityDto.setLon(propertyLookup.valueOf(lonDto, LON));
+        return cityDto;
     };
 
     public static final Instantiator<CityRequest> BasicCityRequest = propertyLookup -> {

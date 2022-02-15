@@ -1,4 +1,4 @@
-package com.hraczynski.trains;
+package com.hraczynski.trains.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;

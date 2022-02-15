@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -37,9 +38,10 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     private final PriceService priceService;
     private final ReservationPricesBinder reservationPricesBinder;
     private final ReservationTrainBinder reservationTrainBinder;
+    private final ReservationContentService reservationContentService;
 
     @Override
-    public CollectionModel<ReservationDTO> getAll() {
+    public CollectionModel<ReservationDto> getAll() {
         log.info("Looking for all Reservations");
         Set<Reservation> reservations = reservationRepository.findAll();
 
@@ -52,24 +54,32 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     }
 
     @Override
-    public ReservationDTO getById(Long id) {
+    public ReservationDto getById(Long id) {
         log.info("Looking for Reservation with id = {}", id);
         Reservation entityById = getEntityById(id);
         return assembler.toModel(entityById);
     }
 
     @Override
-    public ReservationDTO addReservation(ReservationRequest request) {
+    @Transactional
+    public ReservationDto addReservation(ReservationRequest request) {
+        return addReservation(request, null);
+    }
+
+    @Override
+    @Transactional
+    public ReservationDto addReservation(ReservationRequest request, BigDecimal resPrice) {
         Reservation reservation = mapper.map(request, Reservation.class);
         checkRoute(request);
         Set<Passenger> passengers = findPassengers(request);
         Long id;
         if (verifyFoundPassengers(passengers, extractIdsFromPassengersRequest(request.getIdPassengersWithDiscounts()))) {
-            BigDecimal resPrice = priceService.getSumFromReservation(request);
-
+            if (resPrice == null) {
+                resPrice = priceService.getSumFromReservation(request);
+            }
             reservation.setPrice(resPrice);
             reservation.setPassengers(passengers);
-            reservation.setStatus(ReservationStatus.IN_PROGRESS);
+            reservation.setStatus(ReservationStatus.INIT);
             reservation.setReservedRoute(getReservedRoute(request));
             reservation.setReservationDate(LocalDateTime.now());
             reservation.setPassengersNotRegistered(passengerNotRegisteredMapper.serialize(request.getPassengerNotRegisteredList()));
@@ -85,10 +95,11 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
             log.error("Cannot find Passenger with id in {}", extractIdsFromPassengersRequest(request.getIdPassengersWithDiscounts()));
             throw new EntityNotFoundException(Passenger.class, "id in " + extractIdsFromPassengersRequest(request.getIdPassengersWithDiscounts()));
         }
-        ReservationDTO reservationDTO = assembler.toModel(reservation.setId(id));
-        reservationDTO.setPassengerNotRegisteredList(request.getPassengerNotRegisteredList());
 
-        return reservationDTO;
+        ReservationDto reservationDto = assembler.toModel(reservation.setId(id));
+        reservationDto.setPassengerNotRegisteredList(request.getPassengerNotRegisteredList());
+
+        return reservationDto;
     }
 
     private void addPricesToReservation(Reservation reservation, ReservationRequest request) {
@@ -144,7 +155,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     }
 
     @Override
-    public ReservationDTO deleteById(Long id) {
+    public ReservationDto deleteById(Long id) {
         Reservation entityById = getEntityById(id);
 
         log.info("Deleting Reservation with id = {}", id);
@@ -153,7 +164,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     }
 
     @Override
-    public ReservationDTO updateById(ReservationRequest request) {
+    public ReservationDto updateById(ReservationRequest request) {
         checkInput(request);
         Reservation entityById = getEntityById(request.getId());
 
@@ -164,7 +175,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     }
 
     @Override
-    public ReservationDTO patchById(ReservationRequest request) {
+    public ReservationDto patchById(ReservationRequest request) {
         checkInput(request);
         Reservation entityById = getEntityById(request.getId());
 
@@ -190,5 +201,22 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
         return Arrays.stream(Discount.values())
                 .collect(Collectors.toMap(s -> s.name().toLowerCase(Locale.ROOT), Discount::getValue));
 
+    }
+
+    @Override
+    public void updateStatus(Reservation reservation, ReservationStatus status) {
+        if (reservation != null && status != null) {
+            log.info("Updating reservation to status {}", status.name());
+            reservation.setStatus(status);
+            reservationRepository.save(reservation);
+            log.info("Reservation status has been successfully updated");
+        } else {
+            throw new IllegalStateException("Reservation is not found and therefore it cannot be updated!");
+        }
+    }
+
+    @Override
+    public Object getContent(String paymentContentId) {
+        return reservationContentService.getContent(paymentContentId);
     }
 }

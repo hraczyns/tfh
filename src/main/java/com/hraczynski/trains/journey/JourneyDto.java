@@ -1,6 +1,6 @@
 package com.hraczynski.trains.journey;
 
-import com.hraczynski.trains.city.CityDTO;
+import com.hraczynski.trains.city.CityDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,9 +13,9 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class JourneyDTO extends RepresentationModel<JourneyDTO> {
+public class JourneyDto extends RepresentationModel<JourneyDto> {
     private int resultId;
-    private CityDTO source;
-    private CityDTO destination;
+    private CityDto source;
+    private CityDto destination;
     private List<JourneyRepresentationModelAssembler.PartOfJourney> partOfJourneys;
 }

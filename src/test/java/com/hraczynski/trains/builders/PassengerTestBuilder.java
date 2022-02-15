@@ -1,7 +1,7 @@
 package com.hraczynski.trains.builders;
 
 import com.hraczynski.trains.passengers.Passenger;
-import com.hraczynski.trains.passengers.PassengerDTO;
+import com.hraczynski.trains.passengers.PassengerDto;
 import com.hraczynski.trains.passengers.PassengerRequest;
 import com.natpryce.makeiteasy.Instantiator;
 import com.natpryce.makeiteasy.Property;
@@ -17,12 +17,12 @@ public abstract class PassengerTestBuilder {
     private static final String COUNTRY_STRING = "Poland";
     private static final Long ID = 11L;
 
-    public static final Property<PassengerDTO, String> nameDTO = Property.newProperty();
-    public static final Property<PassengerDTO, String> surnameDTO = Property.newProperty();
-    public static final Property<PassengerDTO, String> countryDTO = Property.newProperty();
-    public static final Property<PassengerDTO, Long> idDTO = Property.newProperty();
-    public static final Property<PassengerDTO, LocalDate> bornDateDTO = Property.newProperty();
-    public static final Property<PassengerDTO, String> emailDTO = Property.newProperty();
+    public static final Property<PassengerDto, String> nameDto = Property.newProperty();
+    public static final Property<PassengerDto, String> surnameDto = Property.newProperty();
+    public static final Property<PassengerDto, String> countryDto = Property.newProperty();
+    public static final Property<PassengerDto, Long> idDto = Property.newProperty();
+    public static final Property<PassengerDto, LocalDate> bornDateDto = Property.newProperty();
+    public static final Property<PassengerDto, String> emailDto = Property.newProperty();
 
     public static final Property<PassengerRequest, String> nameRequest = Property.newProperty();
     public static final Property<PassengerRequest, String> countryRequest = Property.newProperty();
@@ -38,15 +38,15 @@ public abstract class PassengerTestBuilder {
     public static final Property<Passenger, LocalDate> bornDateEntity = Property.newProperty();
     public static final Property<Passenger, String> emailEntity = Property.newProperty();
 
-    public static final Instantiator<PassengerDTO> BasicPassengerDTO = propertyLookup -> {
-        PassengerDTO passengerDTO = new PassengerDTO();
-        passengerDTO.setCountry(propertyLookup.valueOf(countryDTO, COUNTRY_STRING));
-        passengerDTO.setName(propertyLookup.valueOf(nameDTO, NAME));
-        passengerDTO.setId(propertyLookup.valueOf(idDTO, ID));
-        passengerDTO.setSurname(propertyLookup.valueOf(surnameDTO, SURNAME));
-        passengerDTO.setBornDate(propertyLookup.valueOf(bornDateDTO, BORN_DATE));
-        passengerDTO.setEmail(propertyLookup.valueOf(emailDTO, EMAIL));
-        return passengerDTO;
+    public static final Instantiator<PassengerDto> BasicPassengerDto = propertyLookup -> {
+        PassengerDto passengerDto = new PassengerDto();
+        passengerDto.setCountry(propertyLookup.valueOf(countryDto, COUNTRY_STRING));
+        passengerDto.setName(propertyLookup.valueOf(nameDto, NAME));
+        passengerDto.setId(propertyLookup.valueOf(idDto, ID));
+        passengerDto.setSurname(propertyLookup.valueOf(surnameDto, SURNAME));
+        passengerDto.setBornDate(propertyLookup.valueOf(bornDateDto, BORN_DATE));
+        passengerDto.setEmail(propertyLookup.valueOf(emailDto, EMAIL));
+        return passengerDto;
     };
 
     public static final Instantiator<PassengerRequest> BasicPassengerRequest = propertyLookup -> {

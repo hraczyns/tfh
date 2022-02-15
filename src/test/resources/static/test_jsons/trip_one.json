@@ -1,9 +1,9 @@
 {
   "id": 2,
-  "stopTimeDTOList": [
+  "stopTimeDtoList": [
     {
       "id": 3,
-      "cityDTO": {
+      "cityDto": {
         "id": 2,
         "name": "Radom2",
         "country": "Germany",
@@ -20,7 +20,7 @@
     },
     {
       "id": 7,
-      "cityDTO": {
+      "cityDto": {
         "id": 3,
         "name": "Radom3",
         "country": "Poland",

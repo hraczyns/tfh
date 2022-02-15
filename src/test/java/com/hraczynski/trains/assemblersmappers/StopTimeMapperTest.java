@@ -1,7 +1,7 @@
 package com.hraczynski.trains.assemblersmappers;
 
 import com.hraczynski.trains.city.City;
-import com.hraczynski.trains.city.CityDTO;
+import com.hraczynski.trains.city.CityDto;
 import com.hraczynski.trains.city.CityRepository;
 import com.hraczynski.trains.city.CityRepresentationModelAssembler;
 import com.hraczynski.trains.stoptime.*;
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.hraczynski.trains.builders.CityTestBuilder.BasicCityDTO;
+import static com.hraczynski.trains.builders.CityTestBuilder.BasicCityDto;
 import static com.hraczynski.trains.builders.CityTestBuilder.BasicCityEntity;
 import static com.hraczynski.trains.builders.StopTimeTestBuilder.*;
 import static com.natpryce.makeiteasy.MakeItEasy.a;
@@ -50,20 +50,20 @@ public class StopTimeMapperTest {
     void entityToDtoTest() {
         //given
         StopTime stopTime = givenStopTime();
-        CityDTO cityDTO = givenCityDto();
-        when(cityAssembler.toModel(any(City.class))).thenReturn(cityDTO);
+        CityDto cityDto = givenCityDto();
+        when(cityAssembler.toModel(any(City.class))).thenReturn(cityDto);
 
         //when
-        StopTimeDTO stopTimeDTO = stopTimeMapper.entityToDTO(stopTime);
+        StopTimeDto stopTimeDto = stopTimeMapper.entityToDto(stopTime);
 
         //then
-        assertThat(stopTimeDTO.getId()).isEqualTo(stopTime.getId());
-        assertThat(stopTimeDTO.getDepartureTime()).isEqualTo(stopTime.getDepartureTime());
-        assertThat(stopTimeDTO.getArrivalTime()).isEqualTo(stopTime.getArrivalTime());
-        assertThat(stopTimeDTO.getCityDTO().getId()).isEqualTo(stopTime.getStop().getId());
-        assertThat(stopTimeDTO.getCityDTO().getLat()).isEqualTo(stopTime.getStop().getLat());
-        assertThat(stopTimeDTO.getCityDTO().getLon()).isEqualTo(stopTime.getStop().getLon());
-        assertThat(stopTimeDTO.getCityDTO().getCountry()).isEqualTo(stopTime.getStop().getCountry().getName());
+        assertThat(stopTimeDto.getId()).isEqualTo(stopTime.getId());
+        assertThat(stopTimeDto.getDepartureTime()).isEqualTo(stopTime.getDepartureTime());
+        assertThat(stopTimeDto.getArrivalTime()).isEqualTo(stopTime.getArrivalTime());
+        assertThat(stopTimeDto.getCityDto().getId()).isEqualTo(stopTime.getStop().getId());
+        assertThat(stopTimeDto.getCityDto().getLat()).isEqualTo(stopTime.getStop().getLat());
+        assertThat(stopTimeDto.getCityDto().getLon()).isEqualTo(stopTime.getStop().getLon());
+        assertThat(stopTimeDto.getCityDto().getCountry()).isEqualTo(stopTime.getStop().getCountry().getName());
         verify(cityAssembler).toModel(any(City.class));
     }
 
@@ -95,13 +95,13 @@ public class StopTimeMapperTest {
         when(cityRepository.findById(anyLong())).thenReturn(Optional.ofNullable(city));
 
         //when
-        StopTimeDTO stopTimeDTO = stopTimeMapper.requestToDTO(stopTimeRequest);
+        StopTimeDto stopTimeDto = stopTimeMapper.requestToDto(stopTimeRequest);
 
         //then
-        assertThat(stopTimeDTO.getId()).isEqualTo(stopTimeRequest.getId());
-        assertThat(stopTimeDTO.getDepartureTime()).isEqualTo(stopTimeRequest.getDepartureTime());
-        assertThat(stopTimeDTO.getArrivalTime()).isEqualTo(stopTimeRequest.getArrivalTime());
-        assertThat(stopTimeDTO.getCityDTO().getId()).isEqualTo(stopTimeRequest.getCityId());
+        assertThat(stopTimeDto.getId()).isEqualTo(stopTimeRequest.getId());
+        assertThat(stopTimeDto.getDepartureTime()).isEqualTo(stopTimeRequest.getDepartureTime());
+        assertThat(stopTimeDto.getArrivalTime()).isEqualTo(stopTimeRequest.getArrivalTime());
+        assertThat(stopTimeDto.getCityDto().getId()).isEqualTo(stopTimeRequest.getCityId());
         verify(cityRepository).findById(anyLong());
     }
 
@@ -139,22 +139,22 @@ public class StopTimeMapperTest {
 
     @Test
     @DisplayName("Id to dtos test (many)")
-    void idsToDTOManyTest() {
+    void idsToDtoManyTest() {
         //given
         StopTime stopTime = givenStopTime();
         StopTime stopTime2 = givenStopTime();
-        CityDTO cityDTO = givenCityDto();
-        CityDTO cityDTO2 = givenCityDto();
+        CityDto cityDto = givenCityDto();
+        CityDto cityDto2 = givenCityDto();
         List<Long> idList = List.of(stopTime.getId(), stopTime2.getId());
         doReturn(Optional.of(stopTime), Optional.of(stopTime2)).when(stopsTimeRepository).findById(idList.get(0));
-        when(cityAssembler.toModel(any(City.class))).thenReturn(cityDTO, cityDTO2);
+        when(cityAssembler.toModel(any(City.class))).thenReturn(cityDto, cityDto2);
 
         //when
-        List<StopTimeDTO> results = stopTimeMapper.idsToDTOs(idList);
+        List<StopTimeDto> results = stopTimeMapper.idsToDtos(idList);
 
         //then
         assertThat(results.size()).isEqualTo(idList.size());
-        assertThat(results.stream().map(StopTimeDTO::getId).collect(Collectors.toList())).isEqualTo(idList);
+        assertThat(results.stream().map(StopTimeDto::getId).collect(Collectors.toList())).isEqualTo(idList);
         verify(cityAssembler, times(idList.size())).toModel(any(City.class));
     }
 
@@ -178,22 +178,22 @@ public class StopTimeMapperTest {
     }
 
     @Test
-    @DisplayName("Entities to DTOs test (many)")
-    void entitiesToDTOsManyTest() {
+    @DisplayName("Entities to Dtos test (many)")
+    void entitiesToDtosManyTest() {
         //given
         StopTime stopTime = givenStopTime();
         StopTime stopTime2 = givenStopTime();
         List<StopTime> listOfEntities = List.of(stopTime, stopTime2);
-        CityDTO cityDTO = givenCityDto();
-        CityDTO cityDTO2 = givenCityDto();
-        when(cityAssembler.toModel(any(City.class))).thenReturn(cityDTO, cityDTO2);
+        CityDto cityDto = givenCityDto();
+        CityDto cityDto2 = givenCityDto();
+        when(cityAssembler.toModel(any(City.class))).thenReturn(cityDto, cityDto2);
 
         //when
-        List<StopTimeDTO> result = stopTimeMapper.entitiesToDTOs(listOfEntities);
+        List<StopTimeDto> result = stopTimeMapper.entitiesToDtos(listOfEntities);
 
         //then
         assertThat(result.size()).isEqualTo(listOfEntities.size());
-        assertThat(result.stream().map(StopTimeDTO::getId).collect(Collectors.toList())).isEqualTo(listOfEntities.stream().map(StopTime::getId).collect(Collectors.toList()));
+        assertThat(result.stream().map(StopTimeDto::getId).collect(Collectors.toList())).isEqualTo(listOfEntities.stream().map(StopTime::getId).collect(Collectors.toList()));
     }
 
     @Test
@@ -216,16 +216,16 @@ public class StopTimeMapperTest {
 
     }
 
-    private StopTimeDTO givenStopTimeDTO() {
-        return make(a(BasicStopTimeDTO));
+    private StopTimeDto givenStopTimeDto() {
+        return make(a(BasicStopTimeDto));
     }
 
     private StopTimeRequest givenStopTimeRequest() {
         return make(a(BasicStopTimeRequest));
     }
 
-    private CityDTO givenCityDto() {
-        return make(a(BasicCityDTO));
+    private CityDto givenCityDto() {
+        return make(a(BasicCityDto));
     }
 
     private City givenCity() {

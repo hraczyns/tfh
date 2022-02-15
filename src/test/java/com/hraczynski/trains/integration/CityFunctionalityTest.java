@@ -1,6 +1,6 @@
 package com.hraczynski.trains.integration;
 
-import com.hraczynski.trains.city.CityDTO;
+import com.hraczynski.trains.city.CityDto;
 import com.hraczynski.trains.city.CityRepository;
 import com.hraczynski.trains.city.CityRequest;
 import com.hraczynski.trains.country.CountryRepository;
@@ -114,7 +114,7 @@ public class CityFunctionalityTest extends AbstractIntegrationTest {
         @Sql(scripts = INSERT_CITY)
         void update() throws Exception {
             CityRequest city = prepareCityRequest();
-            simpleVerifyPut(API, city, city.getId(), CityDTO.class);
+            simpleVerifyPut(API, city, city.getId(), CityDto.class);
 
         }
 
@@ -124,12 +124,12 @@ public class CityFunctionalityTest extends AbstractIntegrationTest {
         @Sql(scripts = INSERT_CITY)
         void patchTest(Double lat, Double lon, String name, String countryName) throws Exception {
             CityRequest city = prepareCityRequest(lat, lon, name, countryName);
-            CityDTO cityBeforeChangingAnything = instantiate(findByIdJson(API + "/" + city.getId()), CityDTO.class);
+            CityDto cityBeforeChangingAnything = instantiate(findByIdJson(API + "/" + city.getId()), CityDto.class);
             mvc.perform(patch(API)
                             .contentType(MediaType.APPLICATION_JSON_VALUE)
                             .content(mapper.writeValueAsBytes(city)))
                     .andExpect(status().isNoContent());
-            CityDTO cityAfterRequest = instantiate(findByIdJson(API + "/" + city.getId()), CityDTO.class);
+            CityDto cityAfterRequest = instantiate(findByIdJson(API + "/" + city.getId()), CityDto.class);
 
             verifyPatch(city, cityBeforeChangingAnything, cityAfterRequest);
         }

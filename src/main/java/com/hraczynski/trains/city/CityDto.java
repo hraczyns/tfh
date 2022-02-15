@@ -10,7 +10,7 @@ import org.springframework.hateoas.RepresentationModel;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CityDTO extends RepresentationModel<CityDTO> {
+public class CityDto extends RepresentationModel<CityDto> {
     private Long id;
     private String name;
     private String country;

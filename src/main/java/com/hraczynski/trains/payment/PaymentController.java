@@ -13,7 +13,6 @@ import javax.validation.Valid;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/payment")
-@CrossOrigin(origins = "http://localhost:3006")
 public class PaymentController {
 
     private final PriceService priceService;

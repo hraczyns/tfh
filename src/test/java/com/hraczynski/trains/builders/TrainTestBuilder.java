@@ -2,7 +2,7 @@ package com.hraczynski.trains.builders;
 
 import com.hraczynski.trains.reservations.Reservation;
 import com.hraczynski.trains.train.Train;
-import com.hraczynski.trains.train.TrainDTO;
+import com.hraczynski.trains.train.TrainDto;
 import com.hraczynski.trains.train.TrainRequest;
 import com.hraczynski.trains.train.TrainType;
 import com.natpryce.makeiteasy.Instantiator;
@@ -34,22 +34,22 @@ public class TrainTestBuilder {
     public static final Property<TrainRequest, String> nameRequest = Property.newProperty();
     public static final Property<TrainRequest, String> repUniqueRequest = Property.newProperty();
 
-    public static final Property<TrainDTO, Long> idDto = Property.newProperty();
-    public static final Property<TrainDTO, Integer> numOfSeatsDto = Property.newProperty();
-    public static final Property<TrainDTO, TrainType> trainTypeDto = Property.newProperty();
-    public static final Property<TrainDTO, String> nameDto = Property.newProperty();
-    public static final Property<TrainDTO, String> repUniqueDto = Property.newProperty();
-    public static final Property<TrainDTO, Boolean> usedDto = Property.newProperty();
+    public static final Property<TrainDto, Long> idDto = Property.newProperty();
+    public static final Property<TrainDto, Integer> numOfSeatsDto = Property.newProperty();
+    public static final Property<TrainDto, TrainType> trainTypeDto = Property.newProperty();
+    public static final Property<TrainDto, String> nameDto = Property.newProperty();
+    public static final Property<TrainDto, String> repUniqueDto = Property.newProperty();
+    public static final Property<TrainDto, Boolean> usedDto = Property.newProperty();
 
-    public static final Instantiator<TrainDTO> BasicTrainDto = propertyLookUp -> {
-        TrainDTO trainDTO = new TrainDTO();
-        trainDTO.setId(propertyLookUp.valueOf(idDto, ID));
-        trainDTO.setUsed(propertyLookUp.valueOf(usedDto, USED));
-        trainDTO.setName(propertyLookUp.valueOf(nameDto, NAME));
-        trainDTO.setModel(propertyLookUp.valueOf(trainTypeDto, TRAIN_TYPE));
-        trainDTO.setNumberOfSeats(propertyLookUp.valueOf(numOfSeatsDto, NUMBER_OF_SEATS));
-        trainDTO.setRepresentationUnique(propertyLookUp.valueOf(repUniqueDto, REPRESENTATION_UNIQUE));
-        return trainDTO;
+    public static final Instantiator<TrainDto> BasicTrainDto = propertyLookUp -> {
+        TrainDto trainDto = new TrainDto();
+        trainDto.setId(propertyLookUp.valueOf(idDto, ID));
+        trainDto.setUsed(propertyLookUp.valueOf(usedDto, USED));
+        trainDto.setName(propertyLookUp.valueOf(nameDto, NAME));
+        trainDto.setModel(propertyLookUp.valueOf(trainTypeDto, TRAIN_TYPE));
+        trainDto.setNumberOfSeats(propertyLookUp.valueOf(numOfSeatsDto, NUMBER_OF_SEATS));
+        trainDto.setRepresentationUnique(propertyLookUp.valueOf(repUniqueDto, REPRESENTATION_UNIQUE));
+        return trainDto;
     };
 
     public static final Instantiator<Train> BasicTrainEntity = propertyLookup -> {

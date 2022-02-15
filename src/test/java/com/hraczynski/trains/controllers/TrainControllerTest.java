@@ -52,16 +52,16 @@ public class TrainControllerTest {
     void findById() {
         //given
         Train train = givenTrain();
-        TrainDTO trainDTO = givenTrainDto();
+        TrainDto trainDto = givenTrainDto();
         when(trainService.findById(anyLong())).thenReturn(train);
-        when(assembler.toModel(train)).thenReturn(trainDTO);
+        when(assembler.toModel(train)).thenReturn(trainDto);
 
         //when
-        ResponseEntity<TrainDTO> responseEntity = controller.findById(train.getId());
+        ResponseEntity<TrainDto> responseEntity = controller.findById(train.getId());
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody()).isEqualTo(trainDTO);
+        assertThat(responseEntity.getBody()).isEqualTo(trainDto);
         verify(trainService).findById(train.getId());
         verifyAssembler(train);
     }
@@ -84,12 +84,12 @@ public class TrainControllerTest {
     void findAll() {
         //given
         Set<Train> trainSet = givenTrainSet();
-        CollectionModel<TrainDTO> collectionModel = givenCollectionModel();
+        CollectionModel<TrainDto> collectionModel = givenCollectionModel();
         when(trainService.findAll()).thenReturn(trainSet);
         when(assembler.toCollectionModel(trainSet)).thenReturn(collectionModel);
 
         //when
-        ResponseEntity<CollectionModel<TrainDTO>> all = controller.findAll();
+        ResponseEntity<CollectionModel<TrainDto>> all = controller.findAll();
 
         //then
         assertThat(all.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -118,16 +118,16 @@ public class TrainControllerTest {
     void deleteById() {
         //given
         Train train = givenTrain();
-        TrainDTO trainDTO = givenTrainDto();
+        TrainDto trainDto = givenTrainDto();
         when(trainService.deleteById(train.getId())).thenReturn(train);
-        when(assembler.toModel(train)).thenReturn(trainDTO);
+        when(assembler.toModel(train)).thenReturn(trainDto);
 
         //when
-        ResponseEntity<TrainDTO> responseEntity = controller.deleteById(train.getId());
+        ResponseEntity<TrainDto> responseEntity = controller.deleteById(train.getId());
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
-        assertThat(responseEntity.getBody()).isEqualTo(trainDTO);
+        assertThat(responseEntity.getBody()).isEqualTo(trainDto);
         verify(trainService).deleteById(train.getId());
         verifyAssembler(train);
     }
@@ -182,18 +182,18 @@ public class TrainControllerTest {
     @DisplayName("Save train")
     void saveTrain() {
         //given
-        TrainDTO trainDTO = givenTrainDto();
+        TrainDto trainDto = givenTrainDto();
         Train train = givenTrain();
         TrainRequest trainRequest = givenTrainRequest();
         when(trainService.save(trainRequest)).thenReturn(train);
-        when(assembler.toModel(train)).thenReturn(trainDTO);
+        when(assembler.toModel(train)).thenReturn(trainDto);
 
         //when
-        ResponseEntity<TrainDTO> responseEntity = controller.addTrain(trainRequest);
+        ResponseEntity<TrainDto> responseEntity = controller.addTrain(trainRequest);
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
-        assertThat(responseEntity.getBody()).isEqualTo(trainDTO);
+        assertThat(responseEntity.getBody()).isEqualTo(trainDto);
 
         verify(trainService).save(argumentCaptor.capture());
         assertThat(trainRequest).isEqualTo(argumentCaptor.getValue());
@@ -262,7 +262,7 @@ public class TrainControllerTest {
         return Set.of(givenTrain());
     }
 
-    private CollectionModel<TrainDTO> givenCollectionModel() {
+    private CollectionModel<TrainDto> givenCollectionModel() {
         return CollectionModel.of(Collections.singleton(givenTrainDto()));
     }
 
@@ -270,7 +270,7 @@ public class TrainControllerTest {
         return make(a(BasicTrainEntity));
     }
 
-    private TrainDTO givenTrainDto() {
+    private TrainDto givenTrainDto() {
         return make(a(BasicTrainDto));
     }
 

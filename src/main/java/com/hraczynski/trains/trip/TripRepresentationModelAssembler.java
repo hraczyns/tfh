@@ -13,34 +13,34 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
 @Slf4j
-public class TripRepresentationModelAssembler extends RepresentationModelAssemblerSupport<Trip, TripDTO> {
+public class TripRepresentationModelAssembler extends RepresentationModelAssemblerSupport<Trip, TripDto> {
 
     private final StopTimeMapper stopTimeMapper;
 
     @Autowired
     public TripRepresentationModelAssembler(StopTimeMapper stopTimeMapper) {
-        super(TripController.class, TripDTO.class);
+        super(TripController.class, TripDto.class);
         this.stopTimeMapper = stopTimeMapper;
     }
 
     @Override
-    public TripDTO toModel(Trip entity) {
+    public TripDto toModel(Trip entity) {
         log.info("Transforming Trip into model");
-        TripDTO tripDTO = instantiateModel(entity);
-        tripDTO.setId(entity.getId());
-        tripDTO.setStopTimeDTOList(stopTimeMapper.entitiesToDTOs(entity.getStopTimes()));
+        TripDto tripDto = instantiateModel(entity);
+        tripDto.setId(entity.getId());
+        tripDto.setStopTimeDtoList(stopTimeMapper.entitiesToDtos(entity.getStopTimes()));
 
-        tripDTO.add(linkTo(methodOn(TripController.class).getById(entity.getId())).withSelfRel());
-        tripDTO.add(linkTo(methodOn(TripController.class).getAll()).withRel("all"));
-        tripDTO.add(linkTo(methodOn(TrainController.class).findById(entity.getTrain().getId())).withRel("train"));
+        tripDto.add(linkTo(methodOn(TripController.class).getById(entity.getId())).withSelfRel());
+        tripDto.add(linkTo(methodOn(TripController.class).getAll()).withRel("all"));
+        tripDto.add(linkTo(methodOn(TrainController.class).findById(entity.getTrain().getId())).withRel("train"));
 
-        return tripDTO;
+        return tripDto;
     }
 
     @Override
-    public CollectionModel<TripDTO> toCollectionModel(Iterable<? extends Trip> entities) {
-        CollectionModel<TripDTO> tripDTOS = super.toCollectionModel(entities);
-        tripDTOS.add(linkTo(methodOn(TripController.class).getAll()).withSelfRel());
-        return tripDTOS;
+    public CollectionModel<TripDto> toCollectionModel(Iterable<? extends Trip> entities) {
+        CollectionModel<TripDto> tripDtoS = super.toCollectionModel(entities);
+        tripDtoS.add(linkTo(methodOn(TripController.class).getAll()).withSelfRel());
+        return tripDtoS;
     }
 }

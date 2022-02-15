@@ -1,15 +1,11 @@
 package com.hraczynski.trains.controllers;
 
-import com.hraczynski.trains.city.City;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
-import com.hraczynski.trains.train.Train;
 import com.hraczynski.trains.trip.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.hateoas.CollectionModel;
@@ -19,7 +15,7 @@ import org.springframework.http.ResponseEntity;
 import java.util.Collections;
 import java.util.Set;
 
-import static com.hraczynski.trains.builders.TripTestBuilder.BasicTripDTO;
+import static com.hraczynski.trains.builders.TripTestBuilder.BasicTripDto;
 import static com.hraczynski.trains.builders.TripTestBuilder.BasicTripEntity;
 import static com.natpryce.makeiteasy.MakeItEasy.a;
 import static com.natpryce.makeiteasy.MakeItEasy.make;
@@ -49,16 +45,16 @@ public class TripControllerTest {
     @Test
     void getById() {
         //given
-        TripDTO tripDTO = givenTripDto();
+        TripDto tripDto = givenTripDto();
         Trip trip = givenTrip();
         when(tripService.getById(trip.getId())).thenReturn(trip);
-        when(assembler.toModel(trip)).thenReturn(tripDTO);
+        when(assembler.toModel(trip)).thenReturn(tripDto);
 
         //when
-        ResponseEntity<TripDTO> byId = controller.getById(trip.getId());
+        ResponseEntity<TripDto> byId = controller.getById(trip.getId());
 
         //then
-        assertThat(byId.getBody()).isEqualTo(tripDTO);
+        assertThat(byId.getBody()).isEqualTo(tripDto);
         assertThat(byId.getStatusCode()).isEqualTo(HttpStatus.OK);
         verify(tripService).getById(trip.getId());
         verifyAssembler(trip);
@@ -82,12 +78,12 @@ public class TripControllerTest {
     void getAll() {
         //given
         Set<Trip> tripSet = givenSet();
-        CollectionModel<TripDTO> tripDtos = givenCollectionModel();
+        CollectionModel<TripDto> tripDtos = givenCollectionModel();
         when(tripService.getAll()).thenReturn(tripSet);
         when(assembler.toCollectionModel(tripSet)).thenReturn(tripDtos);
 
         //when
-        ResponseEntity<CollectionModel<TripDTO>> all = controller.getAll();
+        ResponseEntity<CollectionModel<TripDto>> all = controller.getAll();
 
         //then
         assertThat(all.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -114,12 +110,12 @@ public class TripControllerTest {
     void getAllByTrainId() {
         //given
         Set<Trip> tripSet = givenSet();
-        CollectionModel<TripDTO> tripDtos = givenCollectionModel();
+        CollectionModel<TripDto> tripDtos = givenCollectionModel();
         when(tripService.getTripsByTrainId(TRAIN_ID)).thenReturn(tripSet);
         when(assembler.toCollectionModel(tripSet)).thenReturn(tripDtos);
 
         //when
-        ResponseEntity<CollectionModel<TripDTO>> all = controller.getTripsByTrainId(TRAIN_ID);
+        ResponseEntity<CollectionModel<TripDto>> all = controller.getTripsByTrainId(TRAIN_ID);
 
         //then
         assertThat(all.getStatusCode()).isEqualTo(HttpStatus.OK);
@@ -153,7 +149,7 @@ public class TripControllerTest {
         verify(assembler, never()).toModel(any(Trip.class));
     }
 
-    private CollectionModel<TripDTO> givenCollectionModel() {
+    private CollectionModel<TripDto> givenCollectionModel() {
         return CollectionModel.of(Collections.singleton(givenTripDto()));
     }
 
@@ -161,8 +157,8 @@ public class TripControllerTest {
         return Collections.singleton(givenTrip());
     }
 
-    private TripDTO givenTripDto() {
-        return make(a(BasicTripDTO));
+    private TripDto givenTripDto() {
+        return make(a(BasicTripDto));
     }
 
     private Trip givenTrip() {

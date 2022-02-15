@@ -1,12 +1,12 @@
 {
   "_embedded": {
-    "tripDTOList": [
+    "tripDtoList": [
       {
         "id": 1,
-        "stopTimeDTOList": [
+        "stopTimeDtoList": [
           {
             "id": 2,
-            "cityDTO": {
+            "cityDto": {
               "id": 2,
               "name": "Radom2",
               "country": "Germany",
@@ -23,7 +23,7 @@
           },
           {
             "id": 6,
-            "cityDTO": {
+            "cityDto": {
               "id": 3,
               "name": "Radom3",
               "country": "Poland",
@@ -53,10 +53,10 @@
       },
       {
         "id": 2,
-        "stopTimeDTOList": [
+        "stopTimeDtoList": [
           {
             "id": 3,
-            "cityDTO": {
+            "cityDto": {
               "id": 2,
               "name": "Radom2",
               "country": "Germany",
@@ -73,7 +73,7 @@
           },
           {
             "id": 7,
-            "cityDTO": {
+            "cityDto": {
               "id": 3,
               "name": "Radom3",
               "country": "Poland",

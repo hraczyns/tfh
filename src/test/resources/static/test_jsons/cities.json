@@ -1,6 +1,6 @@
 {
   "_embedded": {
-    "cityDTOList": [
+    "cityDtoList": [
       {
         "id": 2,
         "name": "Radom2",

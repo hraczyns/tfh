@@ -1,13 +1,10 @@
 package com.hraczynski.trains.reservations;
 
+import com.hraczynski.trains.passengers.Passenger;
 import com.hraczynski.trains.payment.Price;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import com.hraczynski.trains.stoptime.StopTime;
 import com.hraczynski.trains.train.Train;
-import com.hraczynski.trains.passengers.Passenger;
+import lombok.*;
 import lombok.experimental.Accessors;
 
 import javax.persistence.*;
@@ -19,6 +16,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Getter
@@ -51,9 +49,13 @@ public class Reservation {
     @JoinTable(name = "trains_reservations", joinColumns = @JoinColumn(name = "reservations_id"), inverseJoinColumns = @JoinColumn(name = "train_id"))
     @NotNull(message = "Error during binding trains with the reservation.")
     private Set<Train> trains;
-    @Pattern(regexp = "(^([a-zA-Z]+@[a-zA-Z]+,?)+$)|^null$")
+    @Pattern(regexp = "(^([a-zA-Z]+<>[a-zA-Z]+<>[a-zA-Z]+@[a-zA-Z]+\\.[a-zA-Z]+,?)+$)|^null$")
     private String passengersNotRegistered;
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "reservation")
     @Size(min = 1, message = "Prices must be specified")
     private Set<Price> prices;
+    @Setter(AccessLevel.NONE)
+    @Column(unique = true)
+    @NotNull(message = "Identifier is null")
+    private String identifier = UUID.randomUUID().toString();
 }

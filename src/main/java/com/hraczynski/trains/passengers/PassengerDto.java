@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @Accessors(chain = true)
-public class PassengerDTO extends RepresentationModel<PassengerDTO> {
+public class PassengerDto extends RepresentationModel<PassengerDto> {
     private Long id;
     private String name;
     private String surname;

@@ -36,7 +36,6 @@ public class CityServiceImpl extends AbstractService<City, CityRepository> imple
             log.error("Cannot find any cities");
             throw new EntityNotFoundException(City.class, "none");
         }
-        log.info(all.toString());
         return all;
     }
 

@@ -11,10 +11,10 @@ import java.util.stream.Collectors;
 @Slf4j
 public class PriceMapper {
 
-    public Set<PriceDTO> entitiesToDTOs(Set<Price> prices) {
+    public Set<PriceDto> entitiesToDtos(Set<Price> prices) {
         log.info("Mapping prices to dtos");
         return prices.stream()
-                .map(price -> new PriceDTO(
+                .map(price -> new PriceDto(
                                 price.getPassengerId(),
                                 price.getName(),
                                 price.getSurname(),
@@ -26,9 +26,9 @@ public class PriceMapper {
                 .collect(Collectors.toSet());
     }
 
-    private List<PartPriceDTO> getMappedPartPrices(List<PartPrice> partPrices) {
+    private List<PartPriceDto> getMappedPartPrices(List<PartPrice> partPrices) {
         return partPrices.stream()
-                .map(partPrice -> new PartPriceDTO(
+                .map(partPrice -> new PartPriceDto(
                                 partPrice.getPrice(),
                                 partPrice.getStartStopTime().getId(),
                                 partPrice.getEndStopTime().getId()

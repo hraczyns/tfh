@@ -1,4 +1,4 @@
-package com.hraczynski.trains;
+package com.hraczynski.trains.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
