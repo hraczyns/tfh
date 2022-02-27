@@ -38,7 +38,6 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     private final PriceService priceService;
     private final ReservationPricesBinder reservationPricesBinder;
     private final ReservationTrainBinder reservationTrainBinder;
-    private final ReservationContentService reservationContentService;
 
     @Override
     public CollectionModel<ReservationDto> getAll() {
@@ -213,10 +212,5 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
         } else {
             throw new IllegalStateException("Reservation is not found and therefore it cannot be updated!");
         }
-    }
-
-    @Override
-    public Object getContent(String paymentContentId) {
-        return reservationContentService.getContent(paymentContentId);
     }
 }

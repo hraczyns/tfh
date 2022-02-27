@@ -1,8 +1,11 @@
 package com.hraczynski.trains.reservations;
 
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
+import com.hraczynski.trains.reservations.reservationscontent.ReservationContentDto;
+import com.hraczynski.trains.reservations.reservationscontent.ReservationContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +20,7 @@ import java.util.Map;
 public class ReservationController {
 
     private final ReservationService reservationService;
+    private final ReservationContentService reservationContentService;
 
     @GetMapping(value = "/all")
     public ResponseEntity<CollectionModel<ReservationDto>> getAll() {
@@ -66,7 +70,19 @@ public class ReservationController {
     }
 
     @GetMapping("/{paymentId}/content")
-    public ResponseEntity<?> getContent(@PathVariable(name = "paymentId") String paymentContentId) {
-        return new ResponseEntity<>(reservationService.getContent(paymentContentId), HttpStatus.OK);
+    public ResponseEntity<byte[]> getContent(@PathVariable(name = "paymentId") String paymentContentId) {
+        ReservationContentDto fileDto = reservationContentService.getContent(paymentContentId);
+        if (fileDto.getFilename() == null || fileDto.getFilename().isEmpty()) {
+            return new ResponseEntity<>(new byte[]{}, HttpStatus.NOT_FOUND);
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentLength(fileDto.getFile().length);
+        headers.set("Content-Disposition", "attachment; filename=" + fileDto.getFilename());
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(fileDto.getFile());
+
     }
 }
+

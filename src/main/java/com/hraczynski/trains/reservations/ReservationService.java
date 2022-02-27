@@ -26,5 +26,4 @@ public interface ReservationService {
 
     void updateStatus(Reservation reservation, ReservationStatus status);
 
-    Object getContent(String paymentContentId);
 }

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *, *::after, *::before {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+
+        .wrapper {
+            font-family: 'Lato', sans-serif;
+            padding: 20px;
+            height: 100vh;
+            font-size: 24px;
+            width: 100%;
+        }
+
+        .element {
+            display: table;
+            table-layout: fixed;
+            width: 100%;
+            list-style-type: none;
+        }
+
+        .element span {
+            display: table-cell;
+            text-align: center;
+            vertical-align: middle;
+            padding: 8px;
+        }
+
+        .element span:first-child {
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .element span:last-child {
+            text-align: right;
+        }
+
+        .img-container {
+            width: 100%;
+            padding-top: 50px;
+            text-align: center;
+        }
+
+        header {
+            text-align: center;
+            font-size: 32px;
+        }
+
+        td, th {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid black;
+            width: 33%;
+        }
+
+        table {
+            margin: 80px auto 0;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+    </style>
+</head>
+<body>
+<main class="wrapper">
+    <header>Train ticket</header>
+    <article class="basic-info">
+        <section class="element">
+            <span>From:</span>
+            <span th:text="${from}"></span>
+        </section>
+        <section class="element">
+            <span>To:</span>
+            <span th:text="${to}"></span>
+        </section>
+        <section class="element">
+            <span>Date:</span>
+            <span th:text="${date}"></span>
+        </section>
+        <section class="element">
+            <span>Train:</span>
+            <span th:text="${trainId}">MARCUS 1</span>
+        </section>
+        <section class="element">
+            <span>Identifier</span>
+            <span th:text="${identifier}"></span>
+        </section>
+    </article>
+    <article>
+        <table>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Discount</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="passenger : ${passengers}">
+                <td th:text="${passenger.name}"></td>
+                <td th:text="${passenger.surname}"></td>
+                <td th:text="${passenger.discountCode}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </article>
+    <article class="img-container">
+        <img alt="asd" th:src="${qrSource}"/>
+    </article>
+</main>
+</body>
+</html>
+
+<!--file:///C:/Users/Hubert/Desktop/projects/flights/-->
+<!--file:///C:/Users/Hubert/Desktop/projects/flights/image.jpg-->

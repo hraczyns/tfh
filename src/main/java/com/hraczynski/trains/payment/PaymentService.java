@@ -1,5 +1,6 @@
 package com.hraczynski.trains.payment;
 
+import com.hraczynski.trains.exceptions.definitions.CannotCreatePaymentException;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import com.hraczynski.trains.passengers.Passenger;
 import com.hraczynski.trains.passengers.PassengerNotRegistered;
@@ -12,7 +13,6 @@ import com.hraczynski.trains.stoptime.StopTimeDto;
 import com.hraczynski.trains.stoptime.StopTimeMapper;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
-import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
 import com.stripe.model.PaymentIntent;
@@ -59,8 +59,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public CreatePaymentResponse createPaymentIntent(ReservationRequest reservationRequest) throws StripeException {
-
+    public CreatePaymentResponse createPaymentIntent(ReservationRequest reservationRequest) {
         BigDecimal sumFromReservation = priceService.getSumFromReservation(reservationRequest);
         List<String> paymentMethodTypes = new ArrayList<>();
         paymentMethodTypes.add("card");
@@ -72,7 +71,13 @@ public class PaymentService {
                         .addAllPaymentMethodType(paymentMethodTypes)
                         .build();
 
-        PaymentIntent paymentIntent = PaymentIntent.create(params);
+        PaymentIntent paymentIntent;
+        try {
+            paymentIntent = PaymentIntent.create(params);
+        } catch (Exception e) {
+            log.error("No stable internet connection. Cannot create payment form request.");
+            throw new CannotCreatePaymentException("No stable internet connection. Cannot create payment form request.");
+        }
 
         List<StopTimeDto> route = getRoute(reservationRequest.getReservedRoute());
         List<SimplePassengerForPaymentSummaryDto> passengers = getPassengersInfo(reservationRequest);
@@ -199,7 +204,7 @@ public class PaymentService {
     public Payment getPayment(String paymentContentId) {
         Payment payment = paymentRepository.findByPaymentId(paymentContentId);
         if (payment == null) {
-            log.error("Cannot find {} with id = {}", Payment.class, paymentContentId);
+            log.error("Cannot find Payment with id = {}", paymentContentId);
             throw new EntityNotFoundException(Payment.class, "id = " + paymentContentId);
         }
         return payment;

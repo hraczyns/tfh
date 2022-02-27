@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        *, *::after, *::before {
+            box-sizing: border-box;
+            padding: 0;
+            margin: 0;
+        }
+
+        .wrapper {
+            font-family: 'Lato', sans-serif;
+            padding: 20px;
+            height: 100vh;
+            font-size: 24px;
+            width: 100%;
+        }
+
+        .element {
+            display: table;
+            table-layout: fixed;
+            width: 100%;
+            list-style-type: none;
+        }
+
+        .element span {
+            display: table-cell;
+            text-align: center;
+            vertical-align: middle;
+            padding: 8px;
+        }
+
+        .element span:first-child {
+            font-weight: bold;
+            text-align: left;
+        }
+
+        .element span:last-child {
+            text-align: right;
+        }
+
+        .img-container {
+            width: 100%;
+            padding-top: 50px;
+            text-align: center;
+        }
+
+        header {
+            text-align: center;
+            font-size: 32px;
+        }
+
+        td, th {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid black;
+            width: 33%;
+        }
+
+        table {
+            margin: 80px auto 0;
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+    </style>
+</head>
+<body>
+<main class="wrapper">
+    <header>Train ticket</header>
+    <article class="basic-info">
+        <section class="element">
+            <span>From:</span>
+            <span>Radom</span>
+        </section>
+        <section class="element">
+            <span>To:</span>
+            <span>Warsaw</span>
+        </section>
+        <section class="element">
+            <span>Date:</span>
+            <span>10:00 02-02-2022r</span>
+        </section>
+        <section class="element">
+            <span>Train:</span>
+            <span>MARCUS 1</span>
+        </section>
+        <section class="element">
+            <span>Identifier</span>
+            <span>blabla</span>
+        </section>
+    </article>
+    <article>
+        <table>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Surname</th>
+                <th>Discount</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Hubert</td>
+                <td>Raczynski</td>
+                <td>-</td>
+            </tr>
+            <tr>
+                <td>Magdalena</td>
+                <td>Derleta</td>
+                <td>Student</td>
+            </tr>
+            </tbody>
+        </table>
+    </article>
+    <article class="img-container">
+        <img alt="asd" src="file:///C:/Users/Hubert/Desktop/projects/flights/image.jpg"/>
+    </article>
+</main>
+</body>
+</html>
+
+<!--file:///C:/Users/Hubert/Desktop/projects/flights/-->
+<!--file:///C:/Users/Hubert/Desktop/projects/flights/image.jpg-->

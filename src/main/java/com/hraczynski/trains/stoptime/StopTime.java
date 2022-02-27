@@ -20,7 +20,7 @@ public class StopTime {
     @Id
     @GeneratedValue
     private Long id;
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "id_city")
     private City stop;
     private LocalDateTime departureTime;
