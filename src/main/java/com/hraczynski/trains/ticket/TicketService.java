@@ -57,7 +57,7 @@ public class TicketService {
         QRCodeWriter barcodeWriter = new QRCodeWriter();
         BitMatrix bitMatrix;
         try {
-            bitMatrix = barcodeWriter.encode(identifier, BarcodeFormat.QR_CODE, 300, 300);
+            bitMatrix = barcodeWriter.encode(identifier, BarcodeFormat.QR_CODE, 240, 240);
             BufferedImage bufferedImage = MatrixToImageWriter.toBufferedImage(bitMatrix);
             ImageIO.write(bufferedImage, "jpg", outputFile);
             return outputFile.getPath();

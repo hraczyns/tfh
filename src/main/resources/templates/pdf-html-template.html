@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>TFH Ticket</title>
     <style>
         *, *::after, *::before {
             box-sizing: border-box;
@@ -19,103 +19,122 @@
         }
 
         .element {
+            font-size: 16px;
             display: table;
             table-layout: fixed;
             width: 100%;
             list-style-type: none;
         }
 
-        .element span {
-            display: table-cell;
+        .route-main {
             text-align: center;
-            vertical-align: middle;
-            padding: 8px;
+            margin-top: 15px;
+            font-size: 36px;
         }
 
-        .element span:first-child {
-            font-weight: bold;
-            text-align: left;
-        }
-
-        .element span:last-child {
-            text-align: right;
-        }
-
-        .img-container {
-            width: 100%;
-            padding-top: 50px;
-            text-align: center;
-        }
-
-        header {
-            text-align: center;
-            font-size: 32px;
+        .route-main--date {
+            font-size: 18px;
         }
 
         td, th {
             padding: 10px;
             text-align: center;
             border: 1px solid black;
-            width: 33%;
         }
 
         table {
-            margin: 80px auto 0;
+            font-size: 12px;
+            margin: 40px auto 0;
             width: 100%;
             border-collapse: collapse;
+        }
+
+        .main-info-table td {
+            border: none;
+        }
+
+        .qr {
+            width: 33%;
+        }
+
+        .route-details-headers {
+
         }
 
     </style>
 </head>
 <body>
 <main class="wrapper">
-    <header>Train ticket</header>
     <article class="basic-info">
-        <section class="element">
-            <span>From:</span>
-            <span th:text="${from}"></span>
-        </section>
-        <section class="element">
-            <span>To:</span>
-            <span th:text="${to}"></span>
-        </section>
-        <section class="element">
-            <span>Date:</span>
-            <span th:text="${date}"></span>
-        </section>
-        <section class="element">
-            <span>Train:</span>
-            <span th:text="${trainId}">MARCUS 1</span>
-        </section>
-        <section class="element">
-            <span>Identifier</span>
-            <span th:text="${identifier}"></span>
-        </section>
+        <table class="main-info-table">
+            <tbody>
+            <tr>
+                <td class="qr">
+                    <img alt="qr" th:src="${qrSource}"/>
+                </td>
+                <td>
+                    <section class="element route-main" th:text="${from} + ' - ' + ${to}">
+                        test1 - test2
+                    </section>
+                    <section class="element route-main route-main--date" th:text="${date}">
+                        date
+                    </section>
+                </td>
+            </tr>
+            </tbody>
+        </table>
     </article>
     <article>
         <table>
             <thead>
             <tr>
+                <th colspan="6">Route details</th>
+            </tr>
+            <tr class="route-details-headers">
+                <th>City source</th>
+                <th>City destination</th>
+                <th>Arrival time</th>
+                <th>Destination time</th>
+                <th>Train</th>
+                <th>Train class</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="detail : ${routeDetails}">
+                <td th:text="${detail.source}">city1</td>
+                <td th:text="${detail.destination}">city2</td>
+                <td th:text="${detail.arrivalTime}">arrival time</td>
+                <td th:text="${detail.departureTime}">dest time</td>
+                <td th:text="${detail.train}">train</td>
+                <td th:text="${detail.trainClass}">eco</td>
+            </tr>
+            </tbody>
+
+        </table>
+    </article>
+    <article>
+        <table>
+            <thead>
+            <tr>
+                <th colspan="4">Passengers</th>
+            </tr>
+            <tr>
                 <th>Name</th>
                 <th>Surname</th>
                 <th>Discount</th>
+                <th>Price</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="passenger : ${passengers}">
                 <td th:text="${passenger.name}"></td>
                 <td th:text="${passenger.surname}"></td>
-                <td th:text="${passenger.discountCode}"></td>
+                <td th:text="${passenger.discount}"></td>
+                <td th:text="${passenger.price}"></td>
             </tr>
             </tbody>
         </table>
     </article>
-    <article class="img-container">
-        <img alt="asd" th:src="${qrSource}"/>
-    </article>
 </main>
 </body>
 </html>
-
-<!--file:///C:/Users/Hubert/Desktop/projects/flights/-->
-<!--file:///C:/Users/Hubert/Desktop/projects/flights/image.jpg-->

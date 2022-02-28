@@ -1,7 +1,6 @@
 package com.hraczynski.trains.passengers;
 
 import com.hraczynski.trains.payment.Discount;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -60,11 +59,10 @@ public class PassengerNotRegisteredMapper {
                     pass.setEmail(passArray[2]);
 
                     if (discountExist(passArray)) {
-                        String discount = StringUtils.capitalize(passArray[3]);
-                        pass.setDiscountCode(discount);
-                    } else {
-                        pass.setDiscountCode("-");
+                        String discount = passArray[3];
+                        pass.setDiscountCode(Discount.valueOf(discount.toUpperCase()).getCode());
                     }
+
                     passengerNotRegistered.add(pass);
                 });
         return passengerNotRegistered;

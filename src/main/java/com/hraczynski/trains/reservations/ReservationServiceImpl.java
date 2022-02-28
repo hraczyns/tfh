@@ -1,6 +1,7 @@
 package com.hraczynski.trains.reservations;
 
 import com.hraczynski.trains.AbstractService;
+import com.hraczynski.trains.email.ReservationEmailService;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import com.hraczynski.trains.exceptions.definitions.InvalidRouteInput;
 import com.hraczynski.trains.passengers.Passenger;
@@ -38,6 +39,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     private final PriceService priceService;
     private final ReservationPricesBinder reservationPricesBinder;
     private final ReservationTrainBinder reservationTrainBinder;
+    private final ReservationEmailService reservationEmailService;
 
     @Override
     public CollectionModel<ReservationDto> getAll() {
@@ -89,7 +91,6 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
             log.info("Saving Reservation");
             id = reservationRepository.save(reservation).getId();
             log.info("Successfully saved");
-
         } else {
             log.error("Cannot find Passenger with id in {}", extractIdsFromPassengersRequest(request.getIdPassengersWithDiscounts()));
             throw new EntityNotFoundException(Passenger.class, "id in " + extractIdsFromPassengersRequest(request.getIdPassengersWithDiscounts()));

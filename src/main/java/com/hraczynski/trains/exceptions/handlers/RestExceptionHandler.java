@@ -31,6 +31,13 @@ import java.util.Objects;
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
 
+    @ExceptionHandler(IllegalStateException.class)
+    protected ResponseEntity<Object> handleIllegalStateException(IllegalStateException exception) {
+        ApiError error = new ApiError(HttpStatus.INTERNAL_SERVER_ERROR);
+        error.setMessage(exception.getMessage());
+        return buildResponseEntity(error);
+    }
+
     @ExceptionHandler(CannotCreatePaymentException.class)
     protected ResponseEntity<Object> handleCannotCreatePaymentException(CannotCreatePaymentException exception) {
         ApiError error = new ApiError(HttpStatus.BAD_REQUEST);
