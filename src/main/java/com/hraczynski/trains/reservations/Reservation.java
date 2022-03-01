@@ -49,7 +49,7 @@ public class Reservation {
     @JoinTable(name = "trains_reservations", joinColumns = @JoinColumn(name = "reservations_id"), inverseJoinColumns = @JoinColumn(name = "train_id"))
     @NotNull(message = "Error during binding trains with the reservation.")
     private Set<Train> trains;
-    @Pattern(regexp = "(^([a-zA-Z]+<>[a-zA-Z]+<>[a-zA-Z]+@[a-zA-Z]+\\.[a-zA-Z]+<>[a-zA-z]*,?)+$)|^null$")
+    @Pattern(regexp = "(^([a-zA-Z]+<>[a-zA-Z]+<>[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+<>[a-zA-z]*,?)+$)|^null$")
     private String passengersNotRegistered;
     @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE}, mappedBy = "reservation")
     @Size(min = 1, message = "Prices must be specified")

@@ -1,6 +1,8 @@
 package com.hraczynski.trains.reservations;
 
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
+import com.hraczynski.trains.payment.Payment;
+import com.hraczynski.trains.payment.PaymentService;
 import com.hraczynski.trains.reservations.reservationscontent.ReservationContentDto;
 import com.hraczynski.trains.reservations.reservationscontent.ReservationContentService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +23,7 @@ public class ReservationController {
 
     private final ReservationService reservationService;
     private final ReservationContentService reservationContentService;
+    private final PaymentService paymentService;
 
     @GetMapping(value = "/all")
     public ResponseEntity<CollectionModel<ReservationDto>> getAll() {
@@ -71,7 +74,8 @@ public class ReservationController {
 
     @GetMapping("/{paymentId}/content")
     public ResponseEntity<byte[]> getContent(@PathVariable(name = "paymentId") String paymentContentId) {
-        ReservationContentDto fileDto = reservationContentService.getContent(paymentContentId);
+        Payment payment = paymentService.getPayment(paymentContentId);
+        ReservationContentDto fileDto = reservationContentService.getContent(payment);
         if (fileDto.getFilename() == null || fileDto.getFilename().isEmpty()) {
             return new ResponseEntity<>(new byte[]{}, HttpStatus.NOT_FOUND);
         }

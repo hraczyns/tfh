@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Completed reservation</title>
+    <style>
+        *, *::after, *::before {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Lato', sans-serif;
+        }
+
+        span, a {
+            font-weight: bold;
+        }
+
+        p, h3 {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+<main>
+    <h3 th:text="'Hello ' + ${username} + '!'">Hi!</h3>
+    <p>Your reservation (<span th:text="${reservationId}">ReservationId</span>) has been completed and your payment has
+        been received. In attachment, we have put your ticket. We wish you a pleasant stay!
+    </p>
+    <br/>
+    <p>You can find your reservation and download ticket if available manually by clicking on <a
+            th:href="@{${reservationLink}}">link</a>.
+        However, you may also log in to your account if you have clicking <a th:href="@{${loginLink}}">here!</a></p>
+    <p>Thank you for buying our product!</p>
+</main>
+</body>
+</html>

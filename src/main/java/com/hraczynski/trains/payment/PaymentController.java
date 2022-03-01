@@ -29,9 +29,9 @@ public class PaymentController {
     }
 
     @PostMapping("/create-payment-intent")
-    public ResponseEntity<CreatePaymentResponse> createPaymentIntent(@Valid @RequestBody ReservationRequest reservationRequest) throws StripeException {
-        CreatePaymentResponse response = paymentService.createPaymentIntent(reservationRequest);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+    public ResponseEntity<CreatePaymentResponse> createPaymentIntent(@Valid @RequestBody ReservationRequest reservationRequest) {
+        CreatePaymentResponse paymentIntent = paymentService.createPaymentIntent(reservationRequest);
+        return new ResponseEntity<>(paymentIntent, HttpStatus.OK);
     }
 
     @PostMapping("/stripe/events")

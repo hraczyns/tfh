@@ -1,0 +1,49 @@
+package com.hraczynski.trains.email;
+
+import com.hraczynski.trains.passengers.Passenger;
+import com.hraczynski.trains.passengers.PassengerNotRegistered;
+import com.hraczynski.trains.passengers.PassengerNotRegisteredMapper;
+import com.hraczynski.trains.reservations.Reservation;
+import com.hraczynski.trains.reservations.ReservationRequest;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+@Service
+@RequiredArgsConstructor
+public class EmailExtractor {
+
+    private final PassengerNotRegisteredMapper passengerNotRegisteredMapper;
+
+    public List<String> getEmails(Reservation reservation, ReservationRequest request) {
+        List<String> list = reservation.getPassengers()
+                .stream()
+                .map(Passenger::getEmail)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        list.addAll(request.getPassengerNotRegisteredList()
+                .stream()
+                .map(PassengerNotRegistered::getEmail)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList())
+        );
+        return list;
+    }
+
+    public List<String> getEmails(Reservation reservation) {
+        List<String> list = reservation.getPassengers()
+                .stream()
+                .map(Passenger::getEmail)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        List<PassengerNotRegistered> passengersNotRegistered = passengerNotRegisteredMapper.deserialize(reservation.getPassengersNotRegistered());
+        list.addAll(passengersNotRegistered.stream()
+                .map(PassengerNotRegistered::getEmail)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList()));
+        return list;
+    }
+}

@@ -1,5 +1,7 @@
 package com.hraczynski.trains.payment;
 
+import com.hraczynski.trains.email.EmailExtractor;
+import com.hraczynski.trains.email.ReservationEmailService;
 import com.hraczynski.trains.exceptions.definitions.CannotCreatePaymentException;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import com.hraczynski.trains.passengers.Passenger;
@@ -9,8 +11,10 @@ import com.hraczynski.trains.passengers.PassengerWithDiscount;
 import com.hraczynski.trains.payment.client.dto.CreatePaymentResponse;
 import com.hraczynski.trains.payment.client.dto.SimplePassengerForPaymentSummaryDto;
 import com.hraczynski.trains.reservations.*;
+import com.hraczynski.trains.reservations.reservationscontent.ReservationContentService;
 import com.hraczynski.trains.stoptime.StopTimeDto;
 import com.hraczynski.trains.stoptime.StopTimeMapper;
+import com.hraczynski.trains.ticket.TicketService;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
@@ -26,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -52,6 +57,9 @@ public class PaymentService {
     private final PassengerService passengerService;
     private final ReservationService reservationService;
     private final PaymentRepository paymentRepository;
+    private final ReservationContentService reservationContentService;
+    private final ReservationEmailService reservationEmailService;
+    private final EmailExtractor emailExtractor;
 
     @PostConstruct
     void initKey() {
@@ -180,6 +188,7 @@ public class PaymentService {
         if (SUCCEEDED.equals(event.getType())) {
             log.info("PaymentIntent is paid successfully! id: {} , status: {}", id, status);
             updateStatusAndModificationDate(payment, COMPLETED);
+            sendEmailWithTicket(payment);
         } else if (CREATED.equals(event.getType())) {
             log.info("PaymentIntent is created! id: {} , status: {}", id, status);
             updateStatusAndModificationDate(payment, IN_PROGRESS);
@@ -188,17 +197,28 @@ public class PaymentService {
         }
     }
 
+    private void sendEmailWithTicket(Payment payment) {
+        Reservation reservation = getReservation(payment);
+        List<String> emails = emailExtractor.getEmails(reservation);
+        File ticket = reservationContentService.getTicket(reservation);
+        reservationEmailService.sendReservationEmailWithTicket(emails, reservation.getIdentifier(), ticket);
+    }
+
     private void updateStatusAndModificationDate(Payment payment, ReservationStatus status) {
         payment.setStatus(status);
         payment.setUpdatedAt(LocalDateTime.now());
-        Long reservationId = payment.getReservationId();
-        Reservation reservation = reservationService.getEntityById(reservationId);
+        Reservation reservation = getReservation(payment);
         reservation.setStatus(status);
 
         log.info("Updating payment to status {}", status.name());
         paymentRepository.save(payment);
         log.info("Payment status has been successfully updated");
         reservationService.updateStatus(reservation, status);
+    }
+
+    private Reservation getReservation(Payment payment) {
+        Long reservationId = payment.getReservationId();
+        return reservationService.getEntityById(reservationId);
     }
 
     public Payment getPayment(String paymentContentId) {

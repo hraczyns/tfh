@@ -16,7 +16,7 @@ public interface ReservationService {
 
     ReservationDto patchById(ReservationRequest request);
 
-    ReservationDto addReservation(ReservationRequest request);
+    ReservationDto addReservation(ReservationRequest reservationRequest);
 
     ReservationDto addReservation(ReservationRequest reservationRequest, BigDecimal sumFromReservation);
 

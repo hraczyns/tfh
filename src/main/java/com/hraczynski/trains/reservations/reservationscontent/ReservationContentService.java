@@ -5,7 +5,6 @@ import com.hraczynski.trains.passengers.PassengerNotRegistered;
 import com.hraczynski.trains.passengers.PassengerNotRegisteredMapper;
 import com.hraczynski.trains.payment.Discount;
 import com.hraczynski.trains.payment.Payment;
-import com.hraczynski.trains.payment.PaymentService;
 import com.hraczynski.trains.payment.Price;
 import com.hraczynski.trains.reservations.Reservation;
 import com.hraczynski.trains.reservations.ReservationRepository;
@@ -33,34 +32,27 @@ import java.util.*;
 @RequiredArgsConstructor
 public class ReservationContentService {
 
-    private final PaymentService paymentService;
     private final ReservationRepository reservationRepository;
     private final TicketService ticketService;
     private final PassengerNotRegisteredMapper passengerNotRegisteredMapper;
 
     @SuppressWarnings("all")
-    public ReservationContentDto getContent(String paymentContentId) {
-        Payment payment = paymentService.getPayment(paymentContentId);
+    public ReservationContentDto getContent(Payment payment) {
+        if (payment == null) {
+            log.error("Payment does not exist. Cannot create ticket!");
+            return new ReservationContentDto(null, new byte[]{});
+        }
         ReservationStatus status = payment.getStatus();
         if (status != ReservationStatus.COMPLETED) {
-            log.warn("Payment {} is in {} status already", paymentContentId, status);
+            log.warn("Payment {} is in {} status already", payment.getPaymentId(), status);
             return new ReservationContentDto(null, new byte[]{});
         }
         Reservation reservation = retrieveReservation(payment.getReservationId());
         log.info("Retrieved reservation");
-        Map<String, Object> map = new HashMap<>();
-        List<StopTime> reservedRoute = reservation.getReservedRoute();
-        StopTime firstStop = reservedRoute.get(0);
-        StopTime lastStop = reservedRoute.get(reservedRoute.size() - 1);
-        map.put("from", firstStop.getStop().getName());
-        map.put("to", lastStop.getStop().getName());
-        map.put("date", formatDate(firstStop.getDepartureTime()) + " - " + formatDate(lastStop.getArrivalTime()));
-        map.put("passengers", preparePassengers(reservation.getPrices(), passengerNotRegisteredMapper.deserialize(reservation.getPassengersNotRegistered())));
-        map.put("routeDetails", prepareRouteDetails(reservedRoute));
-        File file = ticketService.prepareTicketPdf(map, reservation.getIdentifier());
+        File file = getTicket(reservation);
         try {
             if (file != null && file.exists()) {
-                log.info("Successfully created pdf ticket for reservation binded with payment {}", paymentContentId);
+                log.info("Successfully created pdf ticket for reservation binded with payment {}", payment.getPaymentId());
                 return new ReservationContentDto(file.getPath(), Files.readAllBytes(Paths.get(file.getAbsolutePath())));
             }
             return new ReservationContentDto(null, new byte[]{});
@@ -71,6 +63,25 @@ public class ReservationContentService {
                 file.delete();
             }
         }
+    }
+
+    public File getTicket(Reservation reservation) {
+        Map<String, Object> forTicketParams = getForTicketParams(reservation);
+        return ticketService.prepareTicketPdf(forTicketParams, reservation.getIdentifier());
+    }
+
+    private Map<String, Object> getForTicketParams(Reservation reservation) {
+        log.info("Preparing params for ticket creation");
+        Map<String, Object> map = new HashMap<>();
+        List<StopTime> reservedRoute = reservation.getReservedRoute();
+        StopTime firstStop = reservedRoute.get(0);
+        StopTime lastStop = reservedRoute.get(reservedRoute.size() - 1);
+        map.put("from", firstStop.getStop().getName());
+        map.put("to", lastStop.getStop().getName());
+        map.put("date", formatDate(firstStop.getDepartureTime()) + " - " + formatDate(lastStop.getArrivalTime()));
+        map.put("passengers", preparePassengers(reservation.getPrices(), passengerNotRegisteredMapper.deserialize(reservation.getPassengersNotRegistered())));
+        map.put("routeDetails", prepareRouteDetails(reservedRoute));
+        return map;
     }
 
     // to consider when passengers with id come

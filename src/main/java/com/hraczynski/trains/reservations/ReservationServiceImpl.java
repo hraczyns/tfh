@@ -1,13 +1,11 @@
 package com.hraczynski.trains.reservations;
 
 import com.hraczynski.trains.AbstractService;
+import com.hraczynski.trains.email.EmailExtractor;
 import com.hraczynski.trains.email.ReservationEmailService;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import com.hraczynski.trains.exceptions.definitions.InvalidRouteInput;
-import com.hraczynski.trains.passengers.Passenger;
-import com.hraczynski.trains.passengers.PassengerNotRegisteredMapper;
-import com.hraczynski.trains.passengers.PassengerRepository;
-import com.hraczynski.trains.passengers.PassengerWithDiscount;
+import com.hraczynski.trains.passengers.*;
 import com.hraczynski.trains.payment.Discount;
 import com.hraczynski.trains.payment.PriceService;
 import com.hraczynski.trains.stoptime.StopTime;
@@ -40,6 +38,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     private final ReservationPricesBinder reservationPricesBinder;
     private final ReservationTrainBinder reservationTrainBinder;
     private final ReservationEmailService reservationEmailService;
+    private final EmailExtractor emailExtractor;
 
     @Override
     public CollectionModel<ReservationDto> getAll() {
@@ -63,41 +62,42 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
 
     @Override
     @Transactional
-    public ReservationDto addReservation(ReservationRequest request) {
-        return addReservation(request, null);
+    public ReservationDto addReservation(ReservationRequest reservationRequest) {
+        return addReservation(reservationRequest, null);
     }
 
     @Override
     @Transactional
-    public ReservationDto addReservation(ReservationRequest request, BigDecimal resPrice) {
-        Reservation reservation = mapper.map(request, Reservation.class);
-        checkRoute(request);
-        Set<Passenger> passengers = findPassengers(request);
+    public ReservationDto addReservation(ReservationRequest reservationRequest, BigDecimal resPrice) {
+        Reservation reservation = mapper.map(reservationRequest, Reservation.class);
+        checkRoute(reservationRequest);
+        Set<Passenger> passengers = findPassengers(reservationRequest);
         Long id;
-        if (verifyFoundPassengers(passengers, extractIdsFromPassengersRequest(request.getIdPassengersWithDiscounts()))) {
+        if (verifyFoundPassengers(passengers, extractIdsFromPassengersRequest(reservationRequest.getIdPassengersWithDiscounts()))) {
             if (resPrice == null) {
-                resPrice = priceService.getSumFromReservation(request);
+                resPrice = priceService.getSumFromReservation(reservationRequest);
             }
             reservation.setPrice(resPrice);
             reservation.setPassengers(passengers);
             reservation.setStatus(ReservationStatus.INIT);
-            reservation.setReservedRoute(getReservedRoute(request));
+            reservation.setReservedRoute(getReservedRoute(reservationRequest));
             reservation.setReservationDate(LocalDateTime.now());
-            reservation.setPassengersNotRegistered(passengerNotRegisteredMapper.serialize(request.getPassengerNotRegisteredList()));
+            reservation.setPassengersNotRegistered(passengerNotRegisteredMapper.serialize(reservationRequest.getPassengerNotRegisteredList()));
 
-            addPricesToReservation(reservation, request);
+            addPricesToReservation(reservation, reservationRequest);
             addTrainsToReservation(reservation);
 
             log.info("Saving Reservation");
             id = reservationRepository.save(reservation).getId();
             log.info("Successfully saved");
+            reservationEmailService.sendReservationInitEmail(emailExtractor.getEmails(reservation, reservationRequest), reservation.getIdentifier());
         } else {
-            log.error("Cannot find Passenger with id in {}", extractIdsFromPassengersRequest(request.getIdPassengersWithDiscounts()));
-            throw new EntityNotFoundException(Passenger.class, "id in " + extractIdsFromPassengersRequest(request.getIdPassengersWithDiscounts()));
+            log.error("Cannot find Passenger with id in {}", extractIdsFromPassengersRequest(reservationRequest.getIdPassengersWithDiscounts()));
+            throw new EntityNotFoundException(Passenger.class, "id in " + extractIdsFromPassengersRequest(reservationRequest.getIdPassengersWithDiscounts()));
         }
 
         ReservationDto reservationDto = assembler.toModel(reservation.setId(id));
-        reservationDto.setPassengerNotRegisteredList(request.getPassengerNotRegisteredList());
+        reservationDto.setPassengerNotRegisteredList(reservationRequest.getPassengerNotRegisteredList());
 
         return reservationDto;
     }
