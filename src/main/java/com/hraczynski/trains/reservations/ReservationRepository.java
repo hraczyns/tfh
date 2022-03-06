@@ -17,4 +17,6 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
     Optional<Reservation> findById(Long id);
 
     void deleteById(Long id);
+
+    Reservation findByIdentifier(String identifier);
 }

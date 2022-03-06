@@ -8,22 +8,22 @@ import java.util.Map;
 public interface ReservationService {
     CollectionModel<ReservationDto> getAll();
 
-    ReservationDto getById(Long id);
+    Reservation getById(Long id);
 
-    ReservationDto deleteById(Long id);
+    Reservation deleteById(Long id);
 
-    ReservationDto updateById(ReservationRequest request);
+    Reservation updateById(ReservationRequest request);
 
-    ReservationDto patchById(ReservationRequest request);
+    Reservation patchById(ReservationRequest request);
 
-    ReservationDto addReservation(ReservationRequest reservationRequest);
+    Reservation addReservation(ReservationRequest reservationRequest);
 
-    ReservationDto addReservation(ReservationRequest reservationRequest, BigDecimal sumFromReservation);
+    Reservation addReservation(ReservationRequest reservationRequest, BigDecimal sumFromReservation);
 
     Map<String, Double> getPossibleDiscounts();
 
-    Reservation getEntityById(Long id);
-
     void updateStatus(Reservation reservation, ReservationStatus status);
 
+    Reservation getByUniqueIdentifier(String identifier, String email);
+    Reservation getByUniqueIdentifierInternalUsage(String identifier);
 }

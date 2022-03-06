@@ -5,7 +5,10 @@ import com.hraczynski.trains.email.EmailExtractor;
 import com.hraczynski.trains.email.ReservationEmailService;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import com.hraczynski.trains.exceptions.definitions.InvalidRouteInput;
-import com.hraczynski.trains.passengers.*;
+import com.hraczynski.trains.passengers.Passenger;
+import com.hraczynski.trains.passengers.PassengerNotRegisteredMapper;
+import com.hraczynski.trains.passengers.PassengerRepository;
+import com.hraczynski.trains.passengers.PassengerWithDiscount;
 import com.hraczynski.trains.payment.Discount;
 import com.hraczynski.trains.payment.PriceService;
 import com.hraczynski.trains.stoptime.StopTime;
@@ -54,21 +57,20 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     }
 
     @Override
-    public ReservationDto getById(Long id) {
+    public Reservation getById(Long id) {
         log.info("Looking for Reservation with id = {}", id);
-        Reservation entityById = getEntityById(id);
-        return assembler.toModel(entityById);
+        return getEntityById(id);
     }
 
     @Override
     @Transactional
-    public ReservationDto addReservation(ReservationRequest reservationRequest) {
+    public Reservation addReservation(ReservationRequest reservationRequest) {
         return addReservation(reservationRequest, null);
     }
 
     @Override
     @Transactional
-    public ReservationDto addReservation(ReservationRequest reservationRequest, BigDecimal resPrice) {
+    public Reservation addReservation(ReservationRequest reservationRequest, BigDecimal resPrice) {
         Reservation reservation = mapper.map(reservationRequest, Reservation.class);
         checkRoute(reservationRequest);
         Set<Passenger> passengers = findPassengers(reservationRequest);
@@ -89,6 +91,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
 
             log.info("Saving Reservation");
             id = reservationRepository.save(reservation).getId();
+            reservation.setId(id);
             log.info("Successfully saved");
             reservationEmailService.sendReservationInitEmail(emailExtractor.getEmails(reservation, reservationRequest), reservation.getIdentifier());
         } else {
@@ -96,10 +99,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
             throw new EntityNotFoundException(Passenger.class, "id in " + extractIdsFromPassengersRequest(reservationRequest.getIdPassengersWithDiscounts()));
         }
 
-        ReservationDto reservationDto = assembler.toModel(reservation.setId(id));
-        reservationDto.setPassengerNotRegisteredList(reservationRequest.getPassengerNotRegisteredList());
-
-        return reservationDto;
+        return reservation;
     }
 
     private void addPricesToReservation(Reservation reservation, ReservationRequest request) {
@@ -155,27 +155,25 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     }
 
     @Override
-    public ReservationDto deleteById(Long id) {
+    public Reservation deleteById(Long id) {
         Reservation entityById = getEntityById(id);
 
         log.info("Deleting Reservation with id = {}", id);
         reservationRepository.deleteById(id);
-        return assembler.toModel(entityById);
+        return entityById;
     }
 
     @Override
-    public ReservationDto updateById(ReservationRequest request) {
+    public Reservation updateById(ReservationRequest request) {
         checkInput(request);
         Reservation entityById = getEntityById(request.getId());
 
         log.info("Updating Reservation with id = {}", request.getId());
-        Reservation saved = reservationRepository.save(entityById);
-        return assembler.toModel(saved);
-
+        return reservationRepository.save(entityById);
     }
 
     @Override
-    public ReservationDto patchById(ReservationRequest request) {
+    public Reservation patchById(ReservationRequest request) {
         checkInput(request);
         Reservation entityById = getEntityById(request.getId());
 
@@ -187,8 +185,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
         entityById.setPassengers(passengers);
 
         log.info("Patching Reservation with id = {}", request.getId());
-        Reservation saved = reservationRepository.save(entityById);
-        return assembler.toModel(saved);
+        return reservationRepository.save(entityById);
     }
 
     private Set<Passenger> findPassengers(ReservationRequest request) {
@@ -199,8 +196,7 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     public Map<String, Double> getPossibleDiscounts() {
         log.info("Looking for all discounts");
         return Arrays.stream(Discount.values())
-                .collect(Collectors.toMap(s -> s.name().toLowerCase(Locale.ROOT), Discount::getValue));
-
+                .collect(Collectors.toMap(s -> s.name().toLowerCase(), Discount::getValue));
     }
 
     @Override
@@ -214,4 +210,28 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
             throw new IllegalStateException("Reservation is not found and therefore it cannot be updated!");
         }
     }
+
+    @Override
+    public Reservation getByUniqueIdentifier(String identifier, String email) {
+        Reservation reservation = getByUniqueIdentifierInternalUsage(identifier);
+        List<String> emails = emailExtractor.getEmails(reservation);
+        if (email != null && emails.contains(email)) {
+            return reservation;
+        }
+        log.error("Cannot find reservation with identifier = {} which contains email {}", identifier, email);
+        throw new EntityNotFoundException(Reservation.class, "identifier = " + identifier, "email = " + email);
+    }
+
+    @Override
+    public Reservation getByUniqueIdentifierInternalUsage(String identifier) {
+        log.info("Looking for reservation with identifier = {}", identifier);
+        Reservation reservation = reservationRepository.findByIdentifier(identifier);
+        if (reservation == null) {
+            log.error("Cannot find reservation with identifier = {}", identifier);
+            throw new EntityNotFoundException(Reservation.class, "identifier = " + identifier);
+        }
+        return reservation;
+    }
+
+
 }

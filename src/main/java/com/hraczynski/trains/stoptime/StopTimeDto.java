@@ -1,9 +1,8 @@
 package com.hraczynski.trains.stoptime;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hraczynski.trains.city.CityDto;
 import lombok.Getter;
 import lombok.Setter;
-import com.hraczynski.trains.city.CityDto;
 
 import java.time.LocalDateTime;
 
@@ -12,8 +11,6 @@ import java.time.LocalDateTime;
 public class StopTimeDto {
     private Long id;
     private CityDto cityDto;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private LocalDateTime arrivalTime;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private LocalDateTime departureTime;
 }

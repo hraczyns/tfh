@@ -86,7 +86,7 @@ public class ReservationEmailService {
         Context context = new Context();
         context.setVariable("username", email);
         context.setVariable("reservationId", reservationIdentifier);
-        context.setVariable("reservationLink", pageUrl + "/reservations?identifier=" + reservationIdentifier);
+        context.setVariable("reservationLink", pageUrl + "/reservations/search?identifier=" + reservationIdentifier + "&email=" + email);
         context.setVariable("loginLink", pageUrl + "/login");
         return context;
     }

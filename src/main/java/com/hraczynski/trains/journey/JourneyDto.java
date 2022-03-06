@@ -17,5 +17,5 @@ public class JourneyDto extends RepresentationModel<JourneyDto> {
     private int resultId;
     private CityDto source;
     private CityDto destination;
-    private List<JourneyRepresentationModelAssembler.PartOfJourney> partOfJourneys;
+    private List<PartOfJourney> partOfJourneys;
 }

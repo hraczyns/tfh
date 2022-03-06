@@ -25,6 +25,8 @@ public class Payment {
     private Long reservationId;
     @NotEmpty(message = "Error creating payment. Payment intent cannot be resolved.")
     private String paymentId;
+    @NotEmpty(message = "Error creating payment. Reservation identifier cannot be resolved.")
+    private String reservationIdentifier;
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Error creating reservation. Status of reservation cannot be resolved.")
     private ReservationStatus status;

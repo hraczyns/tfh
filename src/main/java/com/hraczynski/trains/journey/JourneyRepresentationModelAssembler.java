@@ -84,11 +84,4 @@ public class JourneyRepresentationModelAssembler extends RepresentationModelAsse
         dto.setResultId(entity.resultId());
         return dto;
     }
-
-    public record PartOfJourneyTimeTable(StopTimeDto start, StopTimeDto end, TrainDto train) implements PartOfJourney {
-    }
-
-    public interface PartOfJourney {
-    }
-
 }

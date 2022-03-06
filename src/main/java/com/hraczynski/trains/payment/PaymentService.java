@@ -14,7 +14,6 @@ import com.hraczynski.trains.reservations.*;
 import com.hraczynski.trains.reservations.reservationscontent.ReservationContentService;
 import com.hraczynski.trains.stoptime.StopTimeDto;
 import com.hraczynski.trains.stoptime.StopTimeMapper;
-import com.hraczynski.trains.ticket.TicketService;
 import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
@@ -91,13 +90,13 @@ public class PaymentService {
         List<SimplePassengerForPaymentSummaryDto> passengers = getPassengersInfo(reservationRequest);
         String email = params.getReceiptEmail();
 
-        ReservationDto reservationDto = reservationService.addReservation(reservationRequest, sumFromReservation);
-        addPayment(reservationDto.getId(), paymentIntent.getId());
-        return new CreatePaymentResponse(paymentIntent.getClientSecret(), sumFromReservation, route, passengers, email, reservationDto.getIdentifier());
+        Reservation reservation = reservationService.addReservation(reservationRequest, sumFromReservation);
+        addPayment(reservation.getId(), reservation.getIdentifier(), paymentIntent.getId());
+        return new CreatePaymentResponse(paymentIntent.getClientSecret(), sumFromReservation, route, passengers, email, reservation.getIdentifier());
     }
 
-    private void addPayment(Long reservationId, String paymentIntentId) {
-        Payment payment = new Payment(null, reservationId, paymentIntentId, ReservationStatus.INIT, LocalDateTime.now(), LocalDateTime.now());
+    private void addPayment(Long reservationId, String reservationIdentifier, String paymentIntentId) {
+        Payment payment = new Payment(null, reservationId, paymentIntentId, reservationIdentifier, ReservationStatus.INIT, LocalDateTime.now(), LocalDateTime.now());
         log.info("Saving payment in init status.");
         paymentRepository.save(payment);
         log.info("Payment in init status has been saved.");
@@ -218,7 +217,7 @@ public class PaymentService {
 
     private Reservation getReservation(Payment payment) {
         Long reservationId = payment.getReservationId();
-        return reservationService.getEntityById(reservationId);
+        return reservationService.getById(reservationId);
     }
 
     public Payment getPayment(String paymentContentId) {
@@ -228,5 +227,23 @@ public class PaymentService {
             throw new EntityNotFoundException(Payment.class, "id = " + paymentContentId);
         }
         return payment;
+    }
+
+    public ReservationShortResponse getReservationIdentifierByPaymentId(String paymentId) {
+        log.info("Looking for reservation identifier by paymentId {}", paymentId);
+        Payment payment = paymentRepository.findByPaymentId(paymentId);
+        if (payment == null) {
+            log.error("Cannot find Payment with id = {}", paymentId);
+            throw new EntityNotFoundException(Payment.class, "paymentId=" + paymentId);
+        }
+        String reservationIdentifier = payment.getReservationIdentifier();
+        Reservation reservation = reservationService.getByUniqueIdentifierInternalUsage(reservationIdentifier);
+        List<String> emails = emailExtractor.getEmails(reservation);
+        if (emails == null || emails.isEmpty()) {
+            log.error("Cannot create short reservation response. No mails are found.");
+            return new ReservationShortResponse();
+        }
+        return new ReservationShortResponse(reservationIdentifier, emails.get(0));
+
     }
 }

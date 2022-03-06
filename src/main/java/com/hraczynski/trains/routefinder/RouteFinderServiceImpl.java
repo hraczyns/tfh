@@ -35,9 +35,8 @@ public class RouteFinderServiceImpl implements RouteFinderService {
         AtomicInteger id = new AtomicInteger(1);
         List<Journey> route = routeFinderRaptor.findRoute(sourceId, destinationId, startFindingTime)
                 .stream()
-                .map(s -> new Journey(id.get(), s.sections()))
+                .map(s -> new Journey(id.getAndIncrement(), s.sections()))
                 .collect(Collectors.toList());
-        id.incrementAndGet();
 
         for (int i = 0; i < results - 1; i++) {
             RouteSection routeSection = route.get(route.size() - 1).sections().get(0);
@@ -49,10 +48,9 @@ public class RouteFinderServiceImpl implements RouteFinderService {
                         .getDepartureTime();
                 List<Journey> next = routeFinderRaptor.findRoute(sourceId, destinationId, departureTime.plusMinutes(1));
                 next = next.stream()
-                        .map(s -> new Journey(id.get(), s.sections()))
+                        .map(s -> new Journey(id.getAndIncrement(), s.sections()))
                         .collect(Collectors.toList());
                 route.addAll(next);
-                id.incrementAndGet();
             }
         }
         return assembler.toCollectionModel(route);

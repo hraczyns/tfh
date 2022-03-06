@@ -98,7 +98,6 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     protected ResponseEntity<Object> handleInvalidDataAccessResourceUsageException(InvalidDataAccessResourceUsageException exception) {
         ApiError error = new ApiError(HttpStatus.BAD_REQUEST);
         error.setMessage("Internal critical api error!");
-        error.setDebugMessage(exception.getMessage());
         return buildResponseEntity(error);
     }
 

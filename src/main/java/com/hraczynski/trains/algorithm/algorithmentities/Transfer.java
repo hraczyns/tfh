@@ -1,6 +1,7 @@
 package com.hraczynski.trains.algorithm.algorithmentities;
 
 import com.hraczynski.trains.city.City;
+import com.hraczynski.trains.journey.PartOfJourney;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -11,7 +12,7 @@ import java.time.Duration;
 @Getter
 @EqualsAndHashCode(callSuper = false)
 @ToString
-public class Transfer extends RouteSection implements JourneyRepresentationModelAssembler.PartOfJourney {
+public class Transfer extends RouteSection implements PartOfJourney {
     private final Duration duration;
     private final double distance;
 

@@ -24,6 +24,7 @@ public class ReservationController {
     private final ReservationService reservationService;
     private final ReservationContentService reservationContentService;
     private final PaymentService paymentService;
+    private final ReservationRepresentationModelAssembler assembler;
 
     @GetMapping(value = "/all")
     public ResponseEntity<CollectionModel<ReservationDto>> getAll() {
@@ -31,28 +32,34 @@ public class ReservationController {
         return new ResponseEntity<>(all, HttpStatus.OK);
     }
 
-    @GetMapping(path = "/{id}")
+    @GetMapping
+    public ResponseEntity<ReservationDto> getByUniqueIdentifierAndEmail(@RequestParam("identifier") String identifier, @RequestParam("email") String email) {
+        Reservation reservation = reservationService.getByUniqueIdentifier(identifier, email);
+        return new ResponseEntity<>(assembler.toModel(reservation), HttpStatus.OK);
+    }
+
+    @GetMapping("/{id}")
     public ResponseEntity<ReservationDto> getById(@PathVariable Long id) {
-        ReservationDto dto = reservationService.getById(id);
-        return new ResponseEntity<>(dto, HttpStatus.OK);
+        Reservation reservation = reservationService.getById(id);
+        return new ResponseEntity<>(assembler.toModel(reservation), HttpStatus.OK);
     }
 
     @PostMapping
     public ResponseEntity<ReservationDto> addReservation(@Valid @RequestBody ReservationRequest request) {
-        ReservationDto reservationDto = reservationService.addReservation(request);
-        return new ResponseEntity<>(reservationDto, HttpStatus.CREATED);
+        Reservation reservation = reservationService.addReservation(request);
+        return new ResponseEntity<>(assembler.toModel(reservation), HttpStatus.CREATED);
     }
 
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<ReservationDto> deleteById(@PathVariable Long id) {
-        ReservationDto dto = reservationService.deleteById(id);
-        return new ResponseEntity<>(dto, HttpStatus.NO_CONTENT);
+        Reservation reservation = reservationService.deleteById(id);
+        return new ResponseEntity<>(assembler.toModel(reservation), HttpStatus.NO_CONTENT);
     }
 
     @PutMapping
     public ResponseEntity<Void> updateById(@Valid @RequestBody ReservationRequest request) {
-        ReservationDto reservationDto = reservationService.updateById(request);
-        if (reservationDto == null) {
+        Reservation reservation = reservationService.updateById(request);
+        if (reservation == null) {
             throw new EntityNotFoundException(Reservation.class, "id = " + request.getId(), request.toString());
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -60,8 +67,8 @@ public class ReservationController {
 
     @PatchMapping
     public ResponseEntity<Void> patchById(@Valid @RequestBody ReservationRequest request) {
-        ReservationDto reservationDto = reservationService.patchById(request);
-        if (reservationDto == null) {
+        Reservation reservation = reservationService.patchById(request);
+        if (reservation == null) {
             throw new EntityNotFoundException(Reservation.class, "id = " + request.getId(), request.toString());
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -73,9 +80,19 @@ public class ReservationController {
     }
 
     @GetMapping("/{paymentId}/content")
-    public ResponseEntity<byte[]> getContent(@PathVariable(name = "paymentId") String paymentContentId) {
+    public ResponseEntity<byte[]> getContentByPaymentId(@PathVariable(name = "paymentId") String paymentContentId) {
         Payment payment = paymentService.getPayment(paymentContentId);
         ReservationContentDto fileDto = reservationContentService.getContent(payment);
+        return getResponse(fileDto);
+    }
+
+    @GetMapping("/content")
+    public ResponseEntity<byte[]> getContentByReservationIdentifierAndEmail(@RequestParam(name = "identifier") String reservationIdentifier, @RequestParam("email") String email) {
+        ReservationContentDto fileDto = reservationContentService.getContent(reservationIdentifier, email);
+        return getResponse(fileDto);
+    }
+
+    private ResponseEntity<byte[]> getResponse(ReservationContentDto fileDto) {
         if (fileDto.getFilename() == null || fileDto.getFilename().isEmpty()) {
             return new ResponseEntity<>(new byte[]{}, HttpStatus.NOT_FOUND);
         }
@@ -86,7 +103,6 @@ public class ReservationController {
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(fileDto.getFile());
-
     }
 }
 

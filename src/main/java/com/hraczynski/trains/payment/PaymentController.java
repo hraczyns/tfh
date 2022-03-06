@@ -2,7 +2,7 @@ package com.hraczynski.trains.payment;
 
 import com.hraczynski.trains.payment.client.dto.CreatePaymentResponse;
 import com.hraczynski.trains.reservations.ReservationRequest;
-import com.stripe.exception.StripeException;
+import com.hraczynski.trains.reservations.ReservationShortResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +37,11 @@ public class PaymentController {
     @PostMapping("/stripe/events")
     public void handleEvents(@RequestHeader("Stripe-Signature") String sigStripe, @RequestBody String payload) {
         paymentService.handleEvents(sigStripe, payload);
+    }
+
+    @GetMapping("/shortResponse/reservations")
+    public ResponseEntity<ReservationShortResponse> getReservationIdentifierByPaymentId(@RequestParam("paymentId") String paymentId){
+        return new ResponseEntity<>(paymentService.getReservationIdentifierByPaymentId(paymentId), HttpStatus.OK);
     }
 
 }

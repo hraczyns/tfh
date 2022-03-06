@@ -1,5 +1,6 @@
 package com.hraczynski.trains.reservations.reservationscontent;
 
+import com.hraczynski.trains.email.EmailExtractor;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import com.hraczynski.trains.passengers.PassengerNotRegistered;
 import com.hraczynski.trains.passengers.PassengerNotRegisteredMapper;
@@ -35,6 +36,31 @@ public class ReservationContentService {
     private final ReservationRepository reservationRepository;
     private final TicketService ticketService;
     private final PassengerNotRegisteredMapper passengerNotRegisteredMapper;
+    private final EmailExtractor emailExtractor;
+
+    public ReservationContentDto getContent(String reservationIdentifier, String email) {
+        Reservation reservation = reservationRepository.findByIdentifier(reservationIdentifier);
+        if (reservation == null) {
+            log.error("Cannot find reservation with identifier = {}", reservationIdentifier);
+            return new ReservationContentDto(null, new byte[]{});
+        }
+        if (reservation.getStatus() != ReservationStatus.COMPLETED) {
+            return new ReservationContentDto(null, new byte[]{});
+        }
+        if (!validateEmail(reservation, email)) {
+            return new ReservationContentDto(null, new byte[]{});
+        }
+        return getReservationContentDto(reservation);
+    }
+
+    private boolean validateEmail(Reservation reservation, String email) {
+        List<String> emails = emailExtractor.getEmails(reservation);
+        if (email == null || !emails.contains(email)) {
+            log.error("Cannot find reservation with identifier = {} which contains email {}", reservation.getIdentifier(), email);
+            return false;
+        }
+        return true;
+    }
 
     @SuppressWarnings("all")
     public ReservationContentDto getContent(Payment payment) {
@@ -49,10 +75,14 @@ public class ReservationContentService {
         }
         Reservation reservation = retrieveReservation(payment.getReservationId());
         log.info("Retrieved reservation");
+        return getReservationContentDto(reservation);
+    }
+
+    private ReservationContentDto getReservationContentDto(Reservation reservation) {
         File file = getTicket(reservation);
         try {
             if (file != null && file.exists()) {
-                log.info("Successfully created pdf ticket for reservation binded with payment {}", payment.getPaymentId());
+                log.info("Successfully created pdf ticket for reservation binded");
                 return new ReservationContentDto(file.getPath(), Files.readAllBytes(Paths.get(file.getAbsolutePath())));
             }
             return new ReservationContentDto(null, new byte[]{});
