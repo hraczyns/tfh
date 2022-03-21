@@ -1,6 +1,7 @@
 package com.hraczynski.trains.exceptions.responses;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.hraczynski.trains.user.RegisterValidation;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.internal.engine.path.PathImpl;
@@ -34,12 +35,6 @@ public class ApiError {
         this.status = status;
     }
 
-    public ApiError(HttpStatus status, Throwable ex) {
-        this(status);
-        this.message = "Unexpected error";
-        this.debugMessage = ex.getLocalizedMessage();
-    }
-
     public ApiError(HttpStatus status, String message, Throwable ex) {
         this(status);
         this.message = message;
@@ -64,6 +59,14 @@ public class ApiError {
 
     private void addValidationError(String object, String message) {
         addSubError(new ApiValidationError(object, message));
+    }
+
+    private void addValidationError(RegisterValidation error) {
+        addSubError(new RegisterValidationError(error.getMessage()));
+    }
+
+    public void addRegisterValidationErrors(List<RegisterValidation> errors) {
+        errors.forEach(this::addValidationError);
     }
 
     private void addValidationError(FieldError fieldError) {
@@ -99,6 +102,5 @@ public class ApiError {
     public void addValidationErrors(Set<ConstraintViolation<?>> constraintViolations) {
         constraintViolations.forEach(this::addValidationError);
     }
-
 
 }

@@ -2,7 +2,6 @@ package com.hraczynski.trains.reservations;
 
 import com.hraczynski.trains.AbstractService;
 import com.hraczynski.trains.email.EmailExtractor;
-import com.hraczynski.trains.email.ReservationEmailService;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import com.hraczynski.trains.exceptions.definitions.InvalidRouteInput;
 import com.hraczynski.trains.passengers.Passenger;

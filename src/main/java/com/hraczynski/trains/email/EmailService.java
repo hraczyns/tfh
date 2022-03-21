@@ -3,6 +3,7 @@ package com.hraczynski.trains.email;
 import lombok.RequiredArgsConstructor;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
@@ -11,6 +12,7 @@ import java.io.File;
 
 @Service
 @RequiredArgsConstructor
+@Async
 public class EmailService {
     private final JavaMailSender javaMailSender;
     private final EmailProperties mailProperties;
@@ -25,7 +27,7 @@ public class EmailService {
         mimeMessageHelper.setFrom(mailProperties.getUsername());
         mimeMessageHelper.setTo(to);
         if (file != null) {
-            mimeMessageHelper.addAttachment("ticket", file);
+            mimeMessageHelper.addAttachment(file.getName(), file);
         }
         mimeMessageHelper.setSubject(title);
         mimeMessageHelper.setText(template, true);

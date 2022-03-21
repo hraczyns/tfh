@@ -36,10 +36,10 @@ public class PassengerServiceImpl extends AbstractService<Passenger, PassengerRe
     @Override
     public Passenger addPassenger(PassengerRequest request) {
         checkInput(request);
-
-        log.info("Saving Passenger {}", request);
-        return passengerRepository.save(mapper.map(request, Passenger.class));
-
+        log.info("Saving Passenger {}", request.getEmail());
+        Passenger passenger = passengerRepository.save(mapper.map(request, Passenger.class));
+        log.info("Passenger saved");
+        return passenger;
     }
 
     @Override

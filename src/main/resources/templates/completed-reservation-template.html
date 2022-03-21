@@ -15,7 +15,7 @@
             font-weight: bold;
         }
 
-        p, h3 {
+        h3 {
             margin: 10px;
         }
     </style>
@@ -23,7 +23,7 @@
 <body>
 <main>
     <h3 th:text="'Hello ' + ${username} + '!'">Hi!</h3>
-    <p>Your reservation (<span th:text="${reservationId}">ReservationId</span>) has been completed and your payment has
+    <p>Your reservation <span th:text="${reservationId}">ReservationId</span> has been completed and your payment has
         been received. In attachment, we have put your ticket. We wish you a pleasant stay!
     </p>
     <br/>

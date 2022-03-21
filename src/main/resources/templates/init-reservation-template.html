@@ -15,7 +15,7 @@
             font-weight: bold;
         }
 
-        p, h3 {
+        h3 {
             margin: 10px;
         }
     </style>
@@ -23,7 +23,7 @@
 <body>
 <main>
     <h3 th:text="'Hello ' + ${username} + '!'">Hi!</h3>
-    <p>Your reservation (<span th:text="${reservationId}">ReservationId</span>) has been created successfully and now
+    <p>Your reservation <span th:text="${reservationId}">ReservationId</span> has been created successfully and now
         remains in init status. When payment is fulfilled, your status will be automatically updated, and you will
         receive your ticket in separated email.</p>
     <p>You can find your reservation and download ticket if available manually by clicking on <a th:href="@{${reservationLink}}">link</a>.

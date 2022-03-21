@@ -1,8 +1,10 @@
-package com.hraczynski.trains.email;
+package com.hraczynski.trains.reservations;
 
+import com.hraczynski.trains.email.EmailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;

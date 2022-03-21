@@ -1,7 +1,7 @@
 package com.hraczynski.trains.payment;
 
 import com.hraczynski.trains.email.EmailExtractor;
-import com.hraczynski.trains.email.ReservationEmailService;
+import com.hraczynski.trains.reservations.ReservationEmailService;
 import com.hraczynski.trains.exceptions.definitions.CannotCreatePaymentException;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import com.hraczynski.trains.passengers.Passenger;

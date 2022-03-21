@@ -1,12 +1,15 @@
 package com.hraczynski.trains.passengers;
 
 import com.hraczynski.trains.reservations.Reservation;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDate;
+import javax.validation.constraints.Pattern;
 import java.util.Set;
 
 @Getter
@@ -23,11 +26,8 @@ public class Passenger {
     private String name;
     @NotBlank(message = "Surname is demanded")
     private String surname;
-    @NotBlank(message = "Country is demanded")
-    private String country;
-    @NotNull(message = "Born date is demanded")
-    private LocalDate bornDate;
     @NotNull(message = "Email is demanded")
+    @Pattern(regexp = "[a-zA-Z0-9]+@[a-zA-Z0-9]+\\.[a-zA-Z0-9]+", message = "Wrong email format. Cannot create passenger")
     private String email;
     @ManyToMany(mappedBy = "passengers", cascade = {CascadeType.MERGE, CascadeType.PERSIST}, fetch = FetchType.LAZY)
     private Set<Reservation> reservations;

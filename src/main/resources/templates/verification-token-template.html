@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" xmlns:th="http://www.thymeleaf.org">
+    <title>User verification email!</title>
+    <style>
+        *, *::after, *::before {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Lato', sans-serif;
+        }
+    </style>
+</head>
+<body>
+<h1>Welcome in our service</h1>
+<p>Hi <span th:text="${username}">user</span>! <br/>
+    We are really glad that you have joined! Please click in the following link to complete your registration <span
+            th:text="${url}">url</span></p>
+</body>
+</html>

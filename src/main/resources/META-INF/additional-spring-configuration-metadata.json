@@ -14,5 +14,10 @@
       "name": "mail-frontend-page-url",
       "type": "java.lang.String",
       "description": "Description for mail-frontend-page-url."
+    },
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "Description for jwt.secret."
     }
   ] }

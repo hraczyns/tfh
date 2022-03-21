@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.converter.HttpMessageNotWritableException;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -30,6 +31,21 @@ import java.util.Objects;
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public ResponseEntity<Object> handleInternalAuthenticationServiceException(InternalAuthenticationServiceException e) {
+        ApiError error = new ApiError(HttpStatus.UNAUTHORIZED);
+        error.setMessage(e.getMessage());
+        return buildResponseEntity(error);
+    }
+
+    @ExceptionHandler(RegisterValidationException.class)
+    protected ResponseEntity<Object> handleRegisterValidationException(RegisterValidationException exception) {
+        ApiError error = new ApiError(HttpStatus.BAD_REQUEST);
+        error.setMessage(exception.getMessage());
+        error.addRegisterValidationErrors(exception.getValidations());
+        return buildResponseEntity(error);
+    }
 
     @ExceptionHandler(IllegalStateException.class)
     protected ResponseEntity<Object> handleIllegalStateException(IllegalStateException exception) {
@@ -94,6 +110,7 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return buildResponseEntity(error);
     }
 
+    @SuppressWarnings("unused")
     @ExceptionHandler(InvalidDataAccessResourceUsageException.class)
     protected ResponseEntity<Object> handleInvalidDataAccessResourceUsageException(InvalidDataAccessResourceUsageException exception) {
         ApiError error = new ApiError(HttpStatus.BAD_REQUEST);

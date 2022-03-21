@@ -21,11 +21,11 @@ public class PassengerMapper {
                     log.error("Cannot find Passenger with id = {}", request.getId());
                     return new EntityNotFoundException(Passenger.class, "id = " + request.getId());
                 });
-        return new Passenger(request.getId(), request.getName(), request.getSurname(), request.getCountry(), request.getBornDate(), request.getEmail(), foundEnt.getReservations());
+        return new Passenger(request.getId(), request.getName(), request.getSurname(), request.getEmail(), foundEnt.getReservations());
     }
 
     public Passenger requestToEntity(PassengerRequest request, Set<Reservation> reservations) {
-        return new Passenger(request.getId(), request.getName(), request.getSurname(), request.getCountry(), request.getBornDate(), request.getEmail(), reservations);
+        return new Passenger(request.getId(), request.getName(), request.getSurname(), request.getEmail(), reservations);
     }
 
     public PassengerDto idToDto(Long id) {
@@ -35,10 +35,8 @@ public class PassengerMapper {
         });
         return new PassengerDto()
                 .setId(id)
-                .setCountry(passenger.getCountry())
                 .setName(passenger.getName())
                 .setSurname(passenger.getSurname())
-                .setBornDate(passenger.getBornDate())
                 .setEmail(passenger.getEmail());
     }
 }
