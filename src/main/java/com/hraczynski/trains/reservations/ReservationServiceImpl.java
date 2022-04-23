@@ -4,10 +4,7 @@ import com.hraczynski.trains.AbstractService;
 import com.hraczynski.trains.email.EmailExtractor;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import com.hraczynski.trains.exceptions.definitions.InvalidRouteInput;
-import com.hraczynski.trains.passengers.Passenger;
-import com.hraczynski.trains.passengers.PassengerNotRegisteredMapper;
-import com.hraczynski.trains.passengers.PassengerRepository;
-import com.hraczynski.trains.passengers.PassengerWithDiscount;
+import com.hraczynski.trains.passengers.*;
 import com.hraczynski.trains.payment.Discount;
 import com.hraczynski.trains.payment.PriceService;
 import com.hraczynski.trains.stoptime.StopTime;
@@ -31,7 +28,7 @@ import java.util.stream.Collectors;
 public class ReservationServiceImpl extends AbstractService<Reservation, ReservationRepository> implements ReservationService {
 
     private final ReservationRepository reservationRepository;
-    private final PassengerRepository passengerRepository;
+    private final PassengerService passengerService;
     private final ReservationRepresentationModelAssembler assembler;
     private final ModelMapper mapper;
     private final StopTimeMapper stopTimeMapper;
@@ -72,9 +69,9 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     public Reservation addReservation(ReservationRequest reservationRequest, BigDecimal resPrice) {
         Reservation reservation = mapper.map(reservationRequest, Reservation.class);
         checkRoute(reservationRequest);
-        Set<Passenger> passengers = findPassengers(reservationRequest);
+        Set<PassengerWithDiscount> passengers = findPassengers(reservationRequest);
         Long id;
-        if (verifyFoundPassengers(passengers, extractIdsFromPassengersRequest(reservationRequest.getIdPassengersWithDiscounts()))) {
+        if (verifyFoundPassengers(passengers, extractIdsFromPassengersRequest(reservationRequest.getIdPassengersWithDiscounts()).keySet())) {
             if (resPrice == null) {
                 resPrice = priceService.getSumFromReservation(reservationRequest);
             }
@@ -128,29 +125,19 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
         reservationTrainBinder.bind(reservation);
     }
 
-    private boolean verifyFoundPassengers(Set<Passenger> passengers, Set<Long> idPassengers) {
+    private boolean verifyFoundPassengers(Set<PassengerWithDiscount> passengers, Set<Long> idPassengers) {
         return passengers != null && passengers.size() == idPassengers.size() && passengers.stream().noneMatch(Objects::isNull);
     }
 
-    private Set<Long> extractIdsFromPassengersRequest(Set<PassengerWithDiscount> passengerWithDiscounts) {
-        return passengerWithDiscounts.stream()
-                .map(PassengerWithDiscount::getPassengerId)
-                .collect(Collectors.toSet());
+    private Map<Long, String> extractIdsFromPassengersRequest(Set<PassengerWithDiscountRequest> passengerWithDiscountRequests) {
+        return passengerWithDiscountRequests.stream()
+                .collect(Collectors.toMap(PassengerWithDiscountRequest::getPassengerId, PassengerWithDiscountRequest::getDiscountCode));
     }
 
-    private Set<Passenger> findPassengers(Set<Long> idPassengers) {
-        return idPassengers.stream()
-                .map(s -> {
-                    Optional<Passenger> byId = passengerRepository.findById(s);
-                    if (byId.isPresent()) {
-                        log.info("Found Passenger for reservation with id = {}", s);
-                        return byId.get();
-                    } else {
-                        log.error("Cannot find Passenger for reservation with id = {}", s);
-                        throw new EntityNotFoundException(Passenger.class, "id = " + s);
-                    }
-
-                }).collect(Collectors.toSet());
+    private Set<PassengerWithDiscount> findAndSavePassengers(Set<PassengerWithDiscountRequest> request) {
+        return request.stream()
+                .map(passengerService::addPassengerWhileReservation)
+                .collect(Collectors.toSet());
     }
 
     @Override
@@ -163,23 +150,24 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
     }
 
     @Override
-    public Reservation updateById(ReservationRequest request) {
+    public Reservation updateById(Long id, ReservationRequest request) {
+        //TODO ?
         checkInput(request);
-        Reservation entityById = getEntityById(request.getId());
+        Reservation entityById = getEntityById(id);
 
-        log.info("Updating Reservation with id = {}", request.getId());
+        log.info("Updating Reservation with id = {}", id);
         return reservationRepository.save(entityById);
     }
 
     @Override
-    public Reservation patchById(ReservationRequest request) {
+    public Reservation patchById(Long id, ReservationRequest request) {
         checkInput(request);
-        Reservation entityById = getEntityById(request.getId());
+        Reservation entityById = getEntityById(id);
 
-        PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(request, entityById);
+        PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(request, entityById, "id");
 
         List<StopTime> stopTimes = stopTimeMapper.idsToEntities(request.getReservedRoute());
-        Set<Passenger> passengers = findPassengers(request);
+        Set<PassengerWithDiscount> passengers = findPassengers(request);
         entityById.setReservedRoute(stopTimes);
         entityById.setPassengers(passengers);
 
@@ -187,8 +175,8 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
         return reservationRepository.save(entityById);
     }
 
-    private Set<Passenger> findPassengers(ReservationRequest request) {
-        return findPassengers(extractIdsFromPassengersRequest(request.getIdPassengersWithDiscounts()));
+    private Set<PassengerWithDiscount> findPassengers(ReservationRequest request) {
+        return findAndSavePassengers(request.getIdPassengersWithDiscounts());
     }
 
     @Override
@@ -230,6 +218,17 @@ public class ReservationServiceImpl extends AbstractService<Reservation, Reserva
             throw new EntityNotFoundException(Reservation.class, "identifier = " + identifier);
         }
         return reservation;
+    }
+
+    @Override
+    public Set<Reservation> getReservationsByPassengerId(Long id) {
+        log.info("Looking for reservations for logged user with passenger id = {}", id);
+        Set<Reservation> reservations = reservationRepository.findByPassengerId(id);
+        if (reservations.isEmpty()) {
+            log.warn("Cannot find any reservations with passenger id = {}", id);
+            throw new EntityNotFoundException(Reservation.class, "passengerId = " + id);
+        }
+        return reservations;
     }
 
 

@@ -1,12 +1,13 @@
 package com.hraczynski.trains.passengers;
 
+import com.hraczynski.trains.AbstractService;
+import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
+import com.hraczynski.trains.payment.Discount;
+import com.hraczynski.trains.utils.PropertiesCopier;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import com.hraczynski.trains.AbstractService;
-import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
-import com.hraczynski.trains.utils.PropertiesCopier;
 
 import java.util.Set;
 
@@ -17,6 +18,7 @@ public class PassengerServiceImpl extends AbstractService<Passenger, PassengerRe
 
     private final ModelMapper mapper;
     private final PassengerRepository passengerRepository;
+    private final PassengerWithDiscountRepository passengerWithDiscountRepository;
 
     @Override
     public Set<Passenger> getAll() {
@@ -53,24 +55,35 @@ public class PassengerServiceImpl extends AbstractService<Passenger, PassengerRe
     }
 
     @Override
-    public void update(PassengerRequest request) {
+    public void update(Long id, PassengerRequest request) {
         checkInput(request);
-        getEntityById(request.getId());
+        getEntityById(id);
 
         Passenger mapped = mapper.map(request, Passenger.class);
-        log.info("Updating Passenger with id = {}", request.getId());
+        mapped.setId(id);
+        log.info("Updating Passenger with id = {}", id);
         passengerRepository.save(mapped);
     }
 
     @Override
-    public void patch(PassengerRequest request) {
+    public void patch(Long id, PassengerRequest request) {
         checkInput(request);
-        Passenger passenger = getEntityById(request.getId());
+        Passenger passenger = getEntityById(id);
 
-        PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(request, passenger);
+        PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(request, passenger, "id");
 //      !  passenger.setReservations(entityById.getReservations()); consider that
 
-        log.info("Patching Passenger with id = {} ", request.getId());
+        log.info("Patching Passenger with id = {} ", id);
         passengerRepository.save(passenger);
+    }
+
+    @Override
+    public PassengerWithDiscount addPassengerWhileReservation(PassengerWithDiscountRequest passengerWithDiscountRequest) {
+        checkInput(passengerWithDiscountRequest);
+        log.info("Saving passenger while reservation.");
+        Long passengerId = passengerWithDiscountRequest.getPassengerId();
+        Passenger entityById = getEntityById(passengerId);
+        PassengerWithDiscount passengerWithDiscount = new PassengerWithDiscount(null, entityById, Discount.findByCode(passengerWithDiscountRequest.getDiscountCode()));
+        return passengerWithDiscountRepository.save(passengerWithDiscount);
     }
 }

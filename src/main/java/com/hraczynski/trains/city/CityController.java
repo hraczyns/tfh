@@ -1,6 +1,7 @@
 package com.hraczynski.trains.city;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -46,15 +47,15 @@ public class CityController {
         return new ResponseEntity<>(cityDto, HttpStatus.OK);
     }
 
-    @PutMapping
-    public ResponseEntity<Void> update(@Valid @RequestBody CityRequest request) {
-        cityService.update(request);
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<Void> update(@PathVariable Long id, @Valid @RequestBody CityRequest request) {
+        cityService.update(id,request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PatchMapping
-    public ResponseEntity<Void> patchById(@Valid @RequestBody CityRequest request) {
-        cityService.patch(request);
+    @PatchMapping(path = "/{id}")
+    public ResponseEntity<Void> patchById(@PathVariable Long id, @Valid @RequestBody CityRequest request) {
+        cityService.patch(id, request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

@@ -11,7 +11,7 @@ public interface CityService {
 
     City deleteById(Long id);
 
-    void update(CityRequest cityRequest);
+    void update(Long id, CityRequest cityRequest);
 
-    void patch(CityRequest cityRequest);
+    void patch(Long id, CityRequest cityRequest);
 }

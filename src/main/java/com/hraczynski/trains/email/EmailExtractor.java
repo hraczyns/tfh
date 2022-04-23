@@ -1,6 +1,5 @@
 package com.hraczynski.trains.email;
 
-import com.hraczynski.trains.passengers.Passenger;
 import com.hraczynski.trains.passengers.PassengerNotRegistered;
 import com.hraczynski.trains.passengers.PassengerNotRegisteredMapper;
 import com.hraczynski.trains.reservations.Reservation;
@@ -24,7 +23,7 @@ public class EmailExtractor {
         log.info("Extracting emails from reservation");
         List<String> list = reservation.getPassengers()
                 .stream()
-                .map(Passenger::getEmail)
+                .map(p -> p.getPassenger().getEmail())
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         list.addAll(request.getPassengerNotRegisteredList()
@@ -40,7 +39,7 @@ public class EmailExtractor {
         log.info("Extracting emails from reservation");
         List<String> list = reservation.getPassengers()
                 .stream()
-                .map(Passenger::getEmail)
+                .map(p -> p.getPassenger().getEmail())
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         List<PassengerNotRegistered> passengersNotRegistered = passengerNotRegisteredMapper.deserialize(reservation.getPassengersNotRegistered());

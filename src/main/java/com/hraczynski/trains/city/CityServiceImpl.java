@@ -57,13 +57,14 @@ public class CityServiceImpl extends AbstractService<City, CityRepository> imple
     }
 
     @Override
-    public void update(CityRequest request) {
+    public void update(Long id, CityRequest request) {
         checkInput(request);
-        getEntityById(request.getId());
+        getEntityById(id);
 
         City entity = mapper.map(request, City.class);
+        entity.setId(id);
         entity.setCountry(findCountryByName(request.getCountry()));
-        log.info("Updating City");
+        log.info("Updating City with id = {}", id);
         cityRepository.save(entity);
     }
 
@@ -76,17 +77,17 @@ public class CityServiceImpl extends AbstractService<City, CityRepository> imple
     }
 
     @Override
-    public void patch(CityRequest request) {
+    public void patch(Long id, CityRequest request) {
         checkInput(request);
-        City entity = getEntityById(request.getId());
+        City entity = getEntityById(id);
 
-        PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(request, entity);
+        PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(request, entity,"id");
         String country = request.getCountry();
 
         if (!StringUtils.isEmpty(country))
             entity.setCountry(findCountryByName(country));
 
-        log.info("Patching City");
+        log.info("Patching City with id = {}", id);
         cityRepository.save(entity);
     }
 

@@ -24,7 +24,7 @@ public class ReservationEmailService {
     private static final String INIT_TEMPLATE = "init-reservation-template";
     private static final String COMPLETED_TEMPLATE = "completed-reservation-template";
 
-    @Value("${mail-frontend-page-url}")
+    @Value("${frontend-page-url}")
     private String pageUrl;
 
     private final EmailService emailService;

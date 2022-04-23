@@ -7,7 +7,7 @@ import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import com.hraczynski.trains.passengers.Passenger;
 import com.hraczynski.trains.passengers.PassengerNotRegistered;
 import com.hraczynski.trains.passengers.PassengerService;
-import com.hraczynski.trains.passengers.PassengerWithDiscount;
+import com.hraczynski.trains.passengers.PassengerWithDiscountRequest;
 import com.hraczynski.trains.payment.client.dto.CreatePaymentResponse;
 import com.hraczynski.trains.payment.client.dto.SimplePassengerForPaymentSummaryDto;
 import com.hraczynski.trains.reservations.*;
@@ -103,12 +103,12 @@ public class PaymentService {
     }
 
     private String extractMail(ReservationRequest reservationRequest) {
-        Iterator<PassengerWithDiscount> iterator = reservationRequest
+        Iterator<PassengerWithDiscountRequest> iterator = reservationRequest
                 .getIdPassengersWithDiscounts()
                 .iterator();
         if (iterator.hasNext()) {
-            PassengerWithDiscount passengerWithDiscount = iterator.next();
-            Long passengerId = passengerWithDiscount.getPassengerId();
+            PassengerWithDiscountRequest passengerWithDiscountRequest = iterator.next();
+            Long passengerId = passengerWithDiscountRequest.getPassengerId();
             return passengerService.getById(passengerId).getEmail();
         }
         List<PassengerNotRegistered> passengerNotRegisteredList = reservationRequest.getPassengerNotRegisteredList();

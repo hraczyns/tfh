@@ -1,11 +1,27 @@
 package com.hraczynski.trains.passengers;
 
-import lombok.Data;
-import lombok.experimental.Accessors;
+import com.hraczynski.trains.payment.Discount;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Data
-@Accessors(chain = true)
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+
+@Entity
+@Table(name = "passengers_with_discount")
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class PassengerWithDiscount {
-    private Long passengerId;
-    private String discountCode;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    @OneToOne
+    @NotNull
+    private Passenger passenger;
+    @Enumerated(EnumType.STRING)
+    private Discount discount;
 }

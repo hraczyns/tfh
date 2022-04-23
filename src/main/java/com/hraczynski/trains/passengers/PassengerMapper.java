@@ -33,8 +33,12 @@ public class PassengerMapper {
             log.error("Cannot find Passenger with id = {}", id);
             return new EntityNotFoundException(Passenger.class, "id = " + id);
         });
+        return entityToDto(passenger);
+    }
+
+    public PassengerDto entityToDto(Passenger passenger) {
         return new PassengerDto()
-                .setId(id)
+                .setId(passenger.getId())
                 .setName(passenger.getName())
                 .setSurname(passenger.getSurname())
                 .setEmail(passenger.getEmail());

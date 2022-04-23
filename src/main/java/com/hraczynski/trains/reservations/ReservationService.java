@@ -4,6 +4,7 @@ import org.springframework.hateoas.CollectionModel;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.util.Set;
 
 public interface ReservationService {
     CollectionModel<ReservationDto> getAll();
@@ -12,9 +13,9 @@ public interface ReservationService {
 
     Reservation deleteById(Long id);
 
-    Reservation updateById(ReservationRequest request);
+    Reservation updateById(Long id, ReservationRequest request);
 
-    Reservation patchById(ReservationRequest request);
+    Reservation patchById(Long id, ReservationRequest request);
 
     Reservation addReservation(ReservationRequest reservationRequest);
 
@@ -25,5 +26,8 @@ public interface ReservationService {
     void updateStatus(Reservation reservation, ReservationStatus status);
 
     Reservation getByUniqueIdentifier(String identifier, String email);
+
     Reservation getByUniqueIdentifierInternalUsage(String identifier);
+
+    Set<Reservation> getReservationsByPassengerId(Long id);
 }

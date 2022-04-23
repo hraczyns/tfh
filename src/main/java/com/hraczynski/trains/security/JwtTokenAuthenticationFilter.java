@@ -2,6 +2,7 @@ package com.hraczynski.trains.security;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.hraczynski.trains.passengers.Passenger;
 import com.hraczynski.trains.user.AppUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -16,6 +17,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -43,12 +45,19 @@ public class JwtTokenAuthenticationFilter extends UsernamePasswordAuthentication
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) {
         AppUser user = (AppUser) authResult.getPrincipal();
+        Passenger passenger = user.getPassenger();
         Algorithm algorithm = JwtUtils.getAlgorithm();
         String accessToken = JWT.create()
                 .withSubject(user.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + HOURS_24))
                 .withIssuer(request.getRequestURL().toString())
-                .withClaim("roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+                .withClaim("basicInfo", Map.of(
+                        "id", passenger.getId(),
+                        "name", passenger.getName(),
+                        "surname", passenger.getSurname(),
+                        "email", passenger.getEmail(),
+                        "roles", user.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList())
+                ))
                 .sign(algorithm);
 
         String contextPath = request.getContextPath();

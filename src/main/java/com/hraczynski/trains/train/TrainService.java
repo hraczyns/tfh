@@ -12,9 +12,9 @@ public interface TrainService {
 
     Train deleteById(Long id);
 
-    void update(TrainRequest request);
+    void update(Long id, TrainRequest request);
 
-    void patch(TrainRequest request);
+    void patch(Long id, TrainRequest request);
 
     byte[] getOneTrainImage(Long trainId);
 

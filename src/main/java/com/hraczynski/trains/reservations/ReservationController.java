@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Map;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -50,26 +51,32 @@ public class ReservationController {
         return new ResponseEntity<>(assembler.toModel(reservation), HttpStatus.CREATED);
     }
 
+    @GetMapping("/passengers/{passengerId}")
+    public ResponseEntity<CollectionModel<ReservationDto>> getReservations(@PathVariable("passengerId") Long id) {
+        Set<Reservation> reservations = reservationService.getReservationsByPassengerId(id);
+        return new ResponseEntity<>(assembler.toCollectionModel(reservations),HttpStatus.OK);
+    }
+
     @DeleteMapping(path = "/{id}")
     public ResponseEntity<ReservationDto> deleteById(@PathVariable Long id) {
         Reservation reservation = reservationService.deleteById(id);
         return new ResponseEntity<>(assembler.toModel(reservation), HttpStatus.NO_CONTENT);
     }
 
-    @PutMapping
-    public ResponseEntity<Void> updateById(@Valid @RequestBody ReservationRequest request) {
-        Reservation reservation = reservationService.updateById(request);
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<Void> updateById(@PathVariable Long id, @Valid @RequestBody ReservationRequest request) {
+        Reservation reservation = reservationService.updateById(id, request);
         if (reservation == null) {
-            throw new EntityNotFoundException(Reservation.class, "id = " + request.getId(), request.toString());
+            throw new EntityNotFoundException(Reservation.class, "id = " + id, request.toString());
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PatchMapping
-    public ResponseEntity<Void> patchById(@Valid @RequestBody ReservationRequest request) {
-        Reservation reservation = reservationService.patchById(request);
+    @PatchMapping(path = "/{id}")
+    public ResponseEntity<Void> patchById(@PathVariable Long id, @Valid @RequestBody ReservationRequest request) {
+        Reservation reservation = reservationService.patchById(id, request);
         if (reservation == null) {
-            throw new EntityNotFoundException(Reservation.class, "id = " + request.getId(), request.toString());
+            throw new EntityNotFoundException(Reservation.class, "id = " + id, request.toString());
         }
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

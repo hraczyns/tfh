@@ -114,12 +114,12 @@ class PassengerControllerTest {
         PassengerRequest passengerRequest = givenRequest();
 
         //when
-        ResponseEntity<Void> responseEntity = controller.update(passengerRequest);
+        ResponseEntity<Void> responseEntity = controller.update(passengerRequest.getId(), passengerRequest);
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        verify(passengerService).update(argumentCaptor.capture());
+        verify(passengerService).update(passengerRequest.getId(), argumentCaptor.capture());
         assertThat(passengerRequest).isEqualTo(argumentCaptor.getValue());
     }
 
@@ -130,12 +130,12 @@ class PassengerControllerTest {
         PassengerRequest passengerRequest = givenRequest();
 
         //when
-        ResponseEntity<Void> responseEntity = controller.patch(passengerRequest);
+        ResponseEntity<Void> responseEntity = controller.patch(passengerRequest.getId(),passengerRequest);
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        verify(passengerService).patch(argumentCaptor.capture());
+        verify(passengerService).patch(passengerRequest.getId(), argumentCaptor.capture());
         assertThat(passengerRequest).isEqualTo(argumentCaptor.getValue());
     }
 

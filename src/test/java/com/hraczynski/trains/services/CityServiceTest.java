@@ -113,7 +113,7 @@ public class CityServiceTest {
             whenBeanUtil();
 
             //when
-            service.update(cityRequest);
+            service.update(cityRequest.getId(), cityRequest);
 
             //then
             verify(countryRepository).findCountryByName(cityRequest.getCountry());
@@ -132,7 +132,7 @@ public class CityServiceTest {
 
             //when
             //then
-            assertThatCode(() -> service.update(cityRequest))
+            assertThatCode(() -> service.update(null, cityRequest))
                     .isInstanceOf(IllegalArgumentException.class);
             verifyNoInteractions(cityRepository);
         }
@@ -147,7 +147,7 @@ public class CityServiceTest {
 
             //when
             //then
-            assertThatCode(() -> service.update(cityRequest))
+            assertThatCode(() -> service.update(cityRequest.getId(), cityRequest))
                     .isInstanceOf(EntityNotFoundException.class);
             verify(cityRepository).findById(-1L);
         }
@@ -169,7 +169,7 @@ public class CityServiceTest {
             whenBeanUtil();
 
             //when
-            service.patch(cityRequest);
+            service.patch(cityRequest.getId(), cityRequest);
 
             //then
             verify(countryRepository).findCountryByName(cityRequest.getCountry());
@@ -192,7 +192,7 @@ public class CityServiceTest {
 
             //when
             //then
-            assertThatCode(() -> service.patch(cityRequest))
+            assertThatCode(() -> service.patch(null, cityRequest))
                     .isInstanceOf(IllegalArgumentException.class);
             verifyNoInteractions(cityRepository);
         }
@@ -207,7 +207,7 @@ public class CityServiceTest {
 
             //when
             //then
-            assertThatCode(() -> service.patch(cityRequest))
+            assertThatCode(() -> service.patch(cityRequest.getId(), cityRequest))
                     .isInstanceOf(EntityNotFoundException.class);
             verify(cityRepository).findById(-1L);
         }

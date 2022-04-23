@@ -3,6 +3,7 @@ package com.hraczynski.trains.reservations;
 import com.hraczynski.trains.journey.PartOfJourney;
 import com.hraczynski.trains.passengers.PassengerDto;
 import com.hraczynski.trains.passengers.PassengerNotRegistered;
+import com.hraczynski.trains.passengers.PassengerWithDiscountDto;
 import com.hraczynski.trains.payment.PriceDto;
 import lombok.Getter;
 import lombok.Setter;
@@ -20,7 +21,7 @@ import java.util.Set;
 public class ReservationDto extends RepresentationModel<ReservationDto> {
     private Long id;
     private List<PartOfJourney> reservedRoute;
-    private Set<PassengerDto> passengers;
+    private Set<PassengerWithDiscountDto> passengers;
     private List<PassengerNotRegistered> passengerNotRegisteredList;
     private LocalDateTime reservationDate;
     private ReservationStatus status;

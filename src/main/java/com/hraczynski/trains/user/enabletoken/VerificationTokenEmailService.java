@@ -20,7 +20,7 @@ public class VerificationTokenEmailService {
     private final EmailService emailService;
     private final TemplateEngine templateEngine;
 
-    @Value("${mail-frontend-page-url}")
+    @Value("${frontend-page-url}")
     private String pageUrl;
 
     public void sendVerificationEmail(String username, String token) {

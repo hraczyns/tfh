@@ -152,12 +152,12 @@ public class TrainControllerTest {
         TrainRequest trainRequest = givenTrainRequest();
 
         //when
-        ResponseEntity<Void> responseEntity = controller.update(trainRequest);
+        ResponseEntity<Void> responseEntity = controller.update(trainRequest.getId(), trainRequest);
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        verify(trainService).update(argumentCaptor.capture());
+        verify(trainService).update(trainRequest.getId(), argumentCaptor.capture());
         assertThat(trainRequest).isEqualTo(argumentCaptor.getValue());
 
     }
@@ -169,12 +169,12 @@ public class TrainControllerTest {
         TrainRequest trainRequest = givenTrainRequest();
 
         //when
-        ResponseEntity<Void> responseEntity = controller.patch(trainRequest);
+        ResponseEntity<Void> responseEntity = controller.patch(trainRequest.getId(), trainRequest);
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        verify(trainService).patch(argumentCaptor.capture());
+        verify(trainService).patch(trainRequest.getId(), argumentCaptor.capture());
         assertThat(trainRequest).isEqualTo(argumentCaptor.getValue());
     }
 

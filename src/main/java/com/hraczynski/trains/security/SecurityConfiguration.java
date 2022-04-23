@@ -1,11 +1,13 @@
 package com.hraczynski.trains.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,11 +19,16 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import static org.springframework.http.HttpMethod.GET;
+import static org.springframework.http.HttpMethod.POST;
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
+    @Value("${frontend-page-url}")
+    private String frontendPageUrl;
     private final UserDetailsService userDetailsService;
     private final JwtTokenAuthorizationFilter jwtTokenAuthorizationFilter;
     private final JwtCookieMergerFilter jwtCookieMergerFilter;
@@ -32,6 +39,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     }
 
     @Override
+    public void configure(WebSecurity web) {
+        web.ignoring()
+                .antMatchers("/h2-console/**","/swagger-ui/**", "/swagger-resources/**", "/v2/api-docs");
+    }
+
+    @Override
     protected void configure(HttpSecurity http) throws Exception {
 
         http
@@ -39,18 +52,31 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 .cors()
                 .and()
-                .csrf().requireCsrfProtectionMatcher(new CsrfProtectionMatcher()).csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()) // yes, I know, owasp said that csrf tokens should not be stored in cookies
+                .csrf().requireCsrfProtectionMatcher(new CsrfProtectionMatcher()).csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 .and()
                 .headers().frameOptions().disable()
                 .and()
+                // general
                 .authorizeRequests()
-                .antMatchers("/*", "/**").permitAll() //testing purposes
+                .antMatchers(GET, "/api/cities/**", "/api/trips/**", "/api/trains/**", "/api/search/**").permitAll()
+                .antMatchers("/api/cities/**", "/api/trips/**", "/api/trains/**").hasRole("ADMIN")
+                .antMatchers("/api/payment/**").permitAll()
+                // passengers
+                .antMatchers(POST, "/api/passengers").permitAll()
+                .antMatchers("/api/passengers/{passengerId}").access("hasRole('ADMIN') or (hasRole('USER') and @userSecurityCheck.hasPassengerId(authentication,#passengerId))")
+                // reservations
+                .antMatchers(POST, "api/reservations").permitAll()
+                .antMatchers("/api/reservations/{reservationId}").access("hasRole('ADMIN') or (hasRole('USER') and @userSecurityCheck.hasPassengerIdByReservationId(authentication,#reservationId))")
+                .antMatchers("/api/reservations/passengers/{passengerId}").access("hasRole('ADMIN') or (hasRole('USER') and @userSecurityCheck.hasPassengerId(authentication,#passengerId))")
+                .antMatchers("/api/reservations/**").permitAll()
+                // auth
+                .antMatchers("/api/login","/api/auth/check","api/logout","/api/register","/api/verification-token").permitAll()
+                //
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JwtTokenAuthenticationFilter(authenticationManagerBean()))
                 .addFilterBefore(jwtTokenAuthorizationFilter, JwtTokenAuthenticationFilter.class)
                 .addFilterBefore(jwtCookieMergerFilter, JwtTokenAuthorizationFilter.class);
-
     }
 
     @Override
@@ -62,9 +88,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     CorsConfigurationSource corsConfigurationSource() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOrigin(frontendPageUrl);
         config.addAllowedHeader("*");
         config.addExposedHeader("*");
+        config.addExposedHeader("Content-Disposition");
         config.addAllowedMethod("*"); // DO NOT DELETE THIS LINE! IT WILL HELP NEXT GENERATIONS!!! THIS IS ABSOLUTELY NECESSARY TO MAKE CORS WORK ON /login ENDPOINT!!! ABSOLUTELY
         config.setAllowCredentials(true);
         source.registerCorsConfiguration("/**", config);

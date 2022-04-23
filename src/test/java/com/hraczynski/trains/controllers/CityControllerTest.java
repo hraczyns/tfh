@@ -150,12 +150,12 @@ class CityControllerTest {
         CityRequest cityRequest = givenRequest();
 
         //when
-        ResponseEntity<Void> responseEntity = controller.update(cityRequest);
+        ResponseEntity<Void> responseEntity = controller.update(cityRequest.getId(), cityRequest);
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        verify(cityService).update(argumentCaptor.capture());
+        verify(cityService).update(cityRequest.getId(), argumentCaptor.capture());
         assertThat(cityRequest).isEqualTo(argumentCaptor.getValue());
 
     }
@@ -167,12 +167,12 @@ class CityControllerTest {
         CityRequest city = givenRequest();
 
         //when
-        ResponseEntity<Void> responseEntity = controller.patchById(city);
+        ResponseEntity<Void> responseEntity = controller.patchById(city.getId(), city);
 
         //then
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.NO_CONTENT);
 
-        verify(cityService).patch(argumentCaptor.capture());
+        verify(cityService).patch(city.getId(), argumentCaptor.capture());
         assertThat(city).isEqualTo(argumentCaptor.getValue());
     }
 
@@ -215,7 +215,7 @@ class CityControllerTest {
     }
 
     private void verifyNeverAssembler() {
-        verify(assembler,never()).toModel(any(City.class));
+        verify(assembler, never()).toModel(any(City.class));
     }
 
     private void verifyAssembler(City city) {

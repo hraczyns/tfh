@@ -22,7 +22,6 @@ public class CityRepresentationModelAssembler extends RepresentationModelAssembl
 
     @Override
     public CityDto toModel(City entity) {
-        log.info("Transforming City into model");
         CityDto cityDto = instantiateModel(entity);
         mapper.map(entity, cityDto);
         cityDto.setCountry(entity.getCountry().getName());

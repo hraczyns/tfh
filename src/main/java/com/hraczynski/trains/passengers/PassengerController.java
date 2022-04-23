@@ -42,15 +42,15 @@ public class PassengerController {
         return new ResponseEntity<>(assembler.toModel(passenger), HttpStatus.OK);
     }
 
-    @PutMapping
-    public ResponseEntity<Void> update(@Valid @RequestBody PassengerRequest request) {
-        passengerService.update(request);
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<Void> update(@PathVariable Long id, @Valid @RequestBody PassengerRequest request) {
+        passengerService.update(id, request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PatchMapping
-    public ResponseEntity<Void> patch(@Valid @RequestBody PassengerRequest request) {
-        passengerService.patch(request);
+    @PatchMapping(path = "/{id}")
+    public ResponseEntity<Void> patch(@PathVariable Long id, @Valid @RequestBody PassengerRequest request) {
+        passengerService.patch(id, request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

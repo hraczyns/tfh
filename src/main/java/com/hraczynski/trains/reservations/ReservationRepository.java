@@ -19,4 +19,10 @@ public interface ReservationRepository extends CrudRepository<Reservation, Long>
     void deleteById(Long id);
 
     Reservation findByIdentifier(String identifier);
+
+    @Query(value = "" +
+            "select distinct a from Reservation a " +
+            "join fetch a.passengers b " +
+            "where b.passenger.id = :id")
+    Set<Reservation> findByPassengerId(Long id);
 }

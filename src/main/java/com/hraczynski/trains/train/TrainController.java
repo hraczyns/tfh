@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -55,26 +54,16 @@ public class TrainController {
         return new ResponseEntity<>(trainDto, HttpStatus.OK);
     }
 
-    @PutMapping
-    public ResponseEntity<Void> update(@Valid @RequestBody TrainRequest request) {
-        trainService.update(request);
+    @PutMapping(path = "/{id}")
+    public ResponseEntity<Void> update(@PathVariable Long id, @Valid @RequestBody TrainRequest request) {
+        trainService.update(id, request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @PatchMapping
-    public ResponseEntity<Void> patch(@Valid @RequestBody TrainRequest request) {
-        trainService.patch(request);
+    @PatchMapping(path = "/{id}")
+    public ResponseEntity<Void> patch(@PathVariable Long id, @Valid @RequestBody TrainRequest request) {
+        trainService.patch(id, request);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
-
-    @GetMapping(value = "/many_images") // FIXME doesn't work as expected
-    public ResponseEntity<List<byte[]>> getSomeTrainImages(@RequestParam(name = "train_id") String trainIds) {
-        List<byte[]> imageList = trainService.getTrainImages(trainIds);
-        final HttpHeaders headers = getHttpHeadersForImageOutput();
-        if (imageList == null || imageList.isEmpty()) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(imageList, headers, HttpStatus.OK);
     }
 
     @GetMapping(value = "/images")

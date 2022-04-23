@@ -43,7 +43,6 @@ public class JourneyRepresentationModelAssembler extends RepresentationModelAsse
 
     @Override
     public JourneyDto toModel(Journey entity) {
-        log.info("Transforming Journey into model");
         JourneyDto dto = instantiateModel(entity);
         entity.sections().forEach(s -> {
             City source = s.getSource();

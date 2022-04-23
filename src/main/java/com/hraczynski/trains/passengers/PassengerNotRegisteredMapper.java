@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,6 +49,9 @@ public class PassengerNotRegisteredMapper {
     }
 
     public List<PassengerNotRegistered> deserialize(String passengersNotRegistered) {
+        if(passengersNotRegistered == null){
+            return Collections.emptyList();
+        }
         String[] passengers = passengersNotRegistered.split(",");
         List<PassengerNotRegistered> passengerNotRegistered = new ArrayList<>();
         Arrays.stream(passengers)

@@ -55,7 +55,6 @@ public class ReservationRepresentationModelAssembler extends RepresentationModel
 
     @Override
     public ReservationDto toModel(Reservation entity) {
-        log.info("Transforming Reservation into model");
         ReservationDto reservationDto = instantiateModel(entity);
         reservationDto.setId(entity.getId());
         reservationDto.setReservationDate(entity.getReservationDate());
@@ -64,7 +63,7 @@ public class ReservationRepresentationModelAssembler extends RepresentationModel
         reservationDto.setReservedRoute(getReservedRouteDtoAndAddLinks(stopTimeMapper.entitiesToDtos(entity.getReservedRoute()), reservationDto));
         reservationDto.setPricesInDetails(getPricesToDto(entity.getPrices()));
         reservationDto.setPassengerNotRegisteredList(passengerNotRegisteredMapper.deserialize(entity.getPassengersNotRegistered()));
-        reservationDto.setPassengers(getPassengersToDtoAndAddLinks(entity.getPassengers(),reservationDto));
+        reservationDto.setPassengers(getPassengersToDtoAndAddLinks(entity.getPassengers(), reservationDto));
         reservationDto.setIdentifier(entity.getIdentifier());
 
         reservationDto.add(linkTo(methodOn(ReservationController.class).getById(entity.getId())).withSelfRel());
@@ -96,14 +95,15 @@ public class ReservationRepresentationModelAssembler extends RepresentationModel
         return stopTimeDtoPairElements;
     }
 
-    private Set<PassengerDto> getPassengersToDtoAndAddLinks(@NotNull Set<Passenger> passengers, ReservationDto reservationDto) {
-        Set<PassengerDto> passengerDtos = new HashSet<>();
-        for (Passenger passenger : passengers) {
-            PassengerDto passengerDto = passengerRepresentationModelAssembler.toModel(passenger);
-            passengerDtos.add(passengerDto);
-            reservationDto.add(linkTo(methodOn(PassengerController.class).getById(passenger.getId())).withRel("passenger_" + passenger.getId()));
+    private Set<PassengerWithDiscountDto> getPassengersToDtoAndAddLinks(@NotNull Set<PassengerWithDiscount> passengers, ReservationDto reservationDto) {
+        Set<PassengerWithDiscountDto> passengerWithDiscountDtos = new HashSet<>();
+        for (PassengerWithDiscount passengerWithDiscount : passengers) {
+            PassengerDto passengerDto = passengerRepresentationModelAssembler.toModel(passengerWithDiscount.getPassenger());
+            PassengerWithDiscountDto passengerWithDiscountDto = new PassengerWithDiscountDto(passengerDto, passengerWithDiscount.getDiscount());
+            passengerWithDiscountDtos.add(passengerWithDiscountDto);
+            reservationDto.add(linkTo(methodOn(PassengerController.class).getById(passengerWithDiscount.getPassenger().getId())).withRel("passenger_" + passengerWithDiscount.getPassenger().getId()));
         }
-        return passengerDtos;
+        return passengerWithDiscountDtos;
     }
 
     @Override

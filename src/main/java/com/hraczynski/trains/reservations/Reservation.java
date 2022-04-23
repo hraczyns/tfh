@@ -1,6 +1,7 @@
 package com.hraczynski.trains.reservations;
 
 import com.hraczynski.trains.passengers.Passenger;
+import com.hraczynski.trains.passengers.PassengerWithDiscount;
 import com.hraczynski.trains.payment.Price;
 import com.hraczynski.trains.stoptime.StopTime;
 import com.hraczynski.trains.train.Train;
@@ -37,7 +38,7 @@ public class Reservation {
     @ManyToMany
     @JoinColumn(name = "id_passenger")
     @NotNull
-    private Set<Passenger> passengers;
+    private Set<PassengerWithDiscount> passengers;
     @ManyToMany(fetch = FetchType.LAZY)
     @NotNull
     @Size(min = 2, message = "Reservation must contain at least two elements of route")

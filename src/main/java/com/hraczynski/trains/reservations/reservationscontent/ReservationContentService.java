@@ -4,6 +4,7 @@ import com.hraczynski.trains.email.EmailExtractor;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
 import com.hraczynski.trains.passengers.PassengerNotRegistered;
 import com.hraczynski.trains.passengers.PassengerNotRegisteredMapper;
+import com.hraczynski.trains.passengers.PassengerWithDiscount;
 import com.hraczynski.trains.payment.Discount;
 import com.hraczynski.trains.payment.Payment;
 import com.hraczynski.trains.payment.Price;
@@ -109,41 +110,61 @@ public class ReservationContentService {
         map.put("from", firstStop.getStop().getName());
         map.put("to", lastStop.getStop().getName());
         map.put("date", formatDate(firstStop.getDepartureTime()) + " - " + formatDate(lastStop.getArrivalTime()));
-        map.put("passengers", preparePassengers(reservation.getPrices(), passengerNotRegisteredMapper.deserialize(reservation.getPassengersNotRegistered())));
+        map.put("passengers", preparePassengers(reservation.getPrices(), reservation.getPassengers(), passengerNotRegisteredMapper.deserialize(reservation.getPassengersNotRegistered())));
         map.put("routeDetails", prepareRouteDetails(reservedRoute));
         return map;
     }
 
-    // to consider when passengers with id come
-    private List<PassengerDetails> preparePassengers(Set<Price> prices, List<PassengerNotRegistered> passengers) {
+    private List<PassengerDetails> preparePassengers(Set<Price> prices, Set<PassengerWithDiscount> reservationPassengers, List<PassengerNotRegistered> passengerNotRegistered) {
         log.info("Preparing passengers for ticket");
         List<PassengerDetails> passengerDetails = new ArrayList<>();
-        if (prices == null || prices.isEmpty() || passengers == null || passengers.isEmpty()) {
+        if (prices == null || prices.isEmpty() || passengersEmpty(reservationPassengers, passengerNotRegistered)) {
             log.error("Passengers or prices are corrupted in already processing ticket creation request.");
             return Collections.emptyList();
         }
         for (Price price : prices) {
-            PassengerNotRegistered passenger = passengers.stream()
-                    .filter(p -> p.getName().equals(price.getName())
-                            && p.getSurname().equals(price.getSurname())
-                            && discountEquals(p.getDiscountCode(), price.getDiscount()))
+            PassengerWithDiscount passengerWithDiscount = reservationPassengers.stream()
+                    .filter(p -> p.getPassenger().getName().equals(price.getName())
+                            && p.getPassenger().getSurname().equals(price.getSurname())
+                            && p.getDiscount() == price.getDiscount())
                     .findFirst()
-                    .orElseThrow(() -> new IllegalStateException("None price matches passengers"));
+                    .orElse(null);
+
             String discount;
             if (price.getDiscount() != null) {
                 discount = StringUtils.capitalize(price.getDiscount().name().toLowerCase());
             } else {
                 discount = "-";
             }
-            passengerDetails.add(new PassengerDetails(
-                    passenger.getName(),
-                    passenger.getSurname(),
-                    discount,
-                    price.getPrice().setScale(2, RoundingMode.HALF_UP).toString()
-            ));
+            if (passengerWithDiscount != null) {
+                passengerDetails.add(new PassengerDetails(
+                        passengerWithDiscount.getPassenger().getName(),
+                        passengerWithDiscount.getPassenger().getSurname(),
+                        discount,
+                        price.getPrice().setScale(2, RoundingMode.HALF_UP).toString()
+                ));
+            } else {
+                PassengerNotRegistered passenger = passengerNotRegistered.stream()
+                        .filter(p -> p.getName().equals(price.getName())
+                                && p.getSurname().equals(price.getSurname())
+                                && discountEquals(p.getDiscountCode(), price.getDiscount()))
+                        .findFirst()
+                        .orElseThrow(() -> new IllegalStateException("None price matches passengers"));
+                passengerDetails.add(new PassengerDetails(
+                        passenger.getName(),
+                        passenger.getSurname(),
+                        discount,
+                        price.getPrice().setScale(2, RoundingMode.HALF_UP).toString()
+                ));
+            }
+
         }
         log.info("Successfully prepared passengers");
         return passengerDetails;
+    }
+
+    private boolean passengersEmpty(Set<PassengerWithDiscount> reservationPassengers, List<PassengerNotRegistered> passengerNotRegistered) {
+        return (reservationPassengers == null || reservationPassengers.isEmpty()) && (passengerNotRegistered == null || passengerNotRegistered.isEmpty()) ;
     }
 
     private boolean discountEquals(String discountCode, Discount discount) {

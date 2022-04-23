@@ -1,7 +1,5 @@
 package com.hraczynski.trains.passengers;
 
-import org.springframework.hateoas.CollectionModel;
-
 import java.util.Set;
 
 public interface PassengerService {
@@ -13,7 +11,9 @@ public interface PassengerService {
 
     Passenger deleteById(Long id);
 
-    void update(PassengerRequest request);
+    void update(Long id, PassengerRequest request);
 
-    void patch(PassengerRequest request);
+    void patch(Long id, PassengerRequest request);
+
+    PassengerWithDiscount addPassengerWhileReservation(PassengerWithDiscountRequest passengerWithDiscountRequest);
 }

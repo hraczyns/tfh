@@ -30,15 +30,17 @@ public class ReservationPricesBinder {
             log.info("Processing price binding");
             Set<Price> prices = new HashSet<>();
 
-            priceResponseWithPassengers.getPriceResponseForPassengersIds()
-                    .forEach(price -> {
-                        Price priceEntity = new Price();
-                        Long passengerId = price.getPassenger().getPassengerId();
-                        Passenger passenger = getPassengerById(passengerId);
-                        fillPriceEntityWithBasicInfo(priceEntity, passenger.getName(), passenger.getSurname(), price.getPassenger().getDiscountCode(), price.getPriceResponse(), reservation);
-                        priceEntity.setPassengerId(passengerId);
-                        prices.add(priceEntity);
-                    });
+            if (priceResponseWithPassengers.getPriceResponseForPassengersIds() != null) {
+                priceResponseWithPassengers.getPriceResponseForPassengersIds()
+                        .forEach(price -> {
+                            Price priceEntity = new Price();
+                            Long passengerId = price.getPassenger().getPassengerId();
+                            Passenger passenger = getPassengerById(passengerId);
+                            fillPriceEntityWithBasicInfo(priceEntity, passenger.getName(), passenger.getSurname(), price.getPassenger().getDiscountCode(), price.getPriceResponse(), reservation);
+                            priceEntity.setPassengerId(passengerId);
+                            prices.add(priceEntity);
+                        });
+            }
 
             if (priceResponseWithPassengers.getPricePerNogRegisteredPassengers() != null) {
                 priceResponseWithPassengers.getPricePerNogRegisteredPassengers()

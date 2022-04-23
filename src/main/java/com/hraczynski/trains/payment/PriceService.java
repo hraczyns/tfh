@@ -3,7 +3,7 @@ package com.hraczynski.trains.payment;
 import com.hraczynski.trains.exceptions.definitions.BadStopTimeIdsFormatRequestException;
 import com.hraczynski.trains.exceptions.definitions.InvalidRequestException;
 import com.hraczynski.trains.passengers.PassengerNotRegistered;
-import com.hraczynski.trains.passengers.PassengerWithDiscount;
+import com.hraczynski.trains.passengers.PassengerWithDiscountRequest;
 import com.hraczynski.trains.reservations.ReservationRequest;
 import com.hraczynski.trains.stoptime.StopTimeRequest;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class PriceService {
             if (discount != null) {
                 priceResolverConfigBuilder = priceResolverConfigBuilder.withDiscount(discount);
             }
-            
+
             BigDecimal calculatePrice = priceResolver.calculatePrice(priceResolverConfigBuilder.build());
             addToResponse(res, id, idPrev, calculatePrice);
         }
@@ -81,25 +81,25 @@ public class PriceService {
         res.getPrices().add(partResponse);
     }
 
-    public PriceResponseWithPassengers getPriceResponseWithPassengers(Set<PassengerWithDiscount> passengersRegisteredWithPotentialDiscounts, List<StopTimeRequest> stopTimeRequests) {
+    public PriceResponseWithPassengers getPriceResponseWithPassengers(Set<PassengerWithDiscountRequest> passengersRegisteredWithPotentialDiscounts, List<StopTimeRequest> stopTimeRequests) {
         List<Long> stopTimeIds = stopTimeRequests.stream().map(StopTimeRequest::getId).collect(Collectors.toList());
         return getPriceResponseWithPassengersCommon(passengersRegisteredWithPotentialDiscounts, null, stopTimeIds);
     }
 
-    public PriceResponseWithPassengers getPriceResponseWithPassengers(Set<PassengerWithDiscount> passengersRegisteredWithPotentialDiscounts, List<Long> stopTimeIds, @SuppressWarnings("unused") boolean onlyStopTimeIds) {
+    public PriceResponseWithPassengers getPriceResponseWithPassengers(Set<PassengerWithDiscountRequest> passengersRegisteredWithPotentialDiscounts, List<Long> stopTimeIds, @SuppressWarnings("unused") boolean onlyStopTimeIds) {
         return getPriceResponseWithPassengersCommon(passengersRegisteredWithPotentialDiscounts, null, stopTimeIds);
     }
 
-    public PriceResponseWithPassengers getPriceResponseWithPassengers(Set<PassengerWithDiscount> passengersRegisteredWithPotentialDiscounts, List<PassengerNotRegistered> passengerNotRegisteredList, List<StopTimeRequest> stopTimeRequests) {
+    public PriceResponseWithPassengers getPriceResponseWithPassengers(Set<PassengerWithDiscountRequest> passengersRegisteredWithPotentialDiscounts, List<PassengerNotRegistered> passengerNotRegisteredList, List<StopTimeRequest> stopTimeRequests) {
         List<Long> stopTimeIds = stopTimeRequests.stream().map(StopTimeRequest::getId).collect(Collectors.toList());
         return getPriceResponseWithPassengersCommon(passengersRegisteredWithPotentialDiscounts, passengerNotRegisteredList, stopTimeIds);
     }
 
-    public PriceResponseWithPassengers getPriceResponseWithPassengers(Set<PassengerWithDiscount> passengersRegisteredWithPotentialDiscounts, List<PassengerNotRegistered> passengerNotRegisteredList, List<Long> stopTimeIds, @SuppressWarnings("unused") boolean onlyStopTimeIds) {
+    public PriceResponseWithPassengers getPriceResponseWithPassengers(Set<PassengerWithDiscountRequest> passengersRegisteredWithPotentialDiscounts, List<PassengerNotRegistered> passengerNotRegisteredList, List<Long> stopTimeIds, @SuppressWarnings("unused") boolean onlyStopTimeIds) {
         return getPriceResponseWithPassengersCommon(passengersRegisteredWithPotentialDiscounts, passengerNotRegisteredList, stopTimeIds);
     }
 
-    private PriceResponseWithPassengers getPriceResponseWithPassengersCommon(Set<PassengerWithDiscount> passengersRegisteredWithPotentialDiscounts, List<PassengerNotRegistered> passengerNotRegisteredList, List<Long> stopTimeIds) {
+    private PriceResponseWithPassengers getPriceResponseWithPassengersCommon(Set<PassengerWithDiscountRequest> passengersRegisteredWithPotentialDiscounts, List<PassengerNotRegistered> passengerNotRegisteredList, List<Long> stopTimeIds) {
 
         Set<PricePerPassenger> pricePerPassengers = passengersRegisteredWithPotentialDiscounts.stream()
                 .map(passenger -> new PricePerPassenger()
@@ -114,8 +114,11 @@ public class PriceService {
                             .setPriceResponse(getPriceResponse(stopTimeIds, passenger.getDiscountCode())))
                     .collect(Collectors.toSet());
         }
-        PriceResponseWithPassengers priceResponseWithPassengers = new PriceResponseWithPassengers()
-                .setPriceResponseForPassengersIds(pricePerPassengers);
+        PriceResponseWithPassengers priceResponseWithPassengers = new PriceResponseWithPassengers();
+
+        if (!pricePerPassengers.isEmpty()) {
+            priceResponseWithPassengers.setPriceResponseForPassengersIds(pricePerPassengers);
+        }
 
         if (!pricePerNogRegisteredPassengers.isEmpty()) {
             priceResponseWithPassengers.setPricePerNogRegisteredPassengers(pricePerNogRegisteredPassengers);
@@ -163,16 +166,19 @@ public class PriceService {
                 request.getReservedRoute(),
                 true
         );
-        BigDecimal price = priceResponseWithPassengers.getPriceResponseForPassengersIds().stream()
-                .map(PricePerPassenger::getPriceResponse)
-                .map(PriceResponse::getPriceInGeneral)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal price = BigDecimal.ZERO;
+        if (priceResponseWithPassengers.getPriceResponseForPassengersIds() != null) {
+            price = price.add(priceResponseWithPassengers.getPriceResponseForPassengersIds().stream()
+                    .map(PricePerPassenger::getPriceResponse)
+                    .map(PriceResponse::getPriceInGeneral)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add));
+        }
 
         if (priceResponseWithPassengers.getPricePerNogRegisteredPassengers() != null) {
-            price = priceResponseWithPassengers.getPricePerNogRegisteredPassengers().stream()
+            price = price.add(priceResponseWithPassengers.getPricePerNogRegisteredPassengers().stream()
                     .map(PricePerNogRegisteredPassenger::getPriceResponse)
                     .map(PriceResponse::getPriceInGeneral)
-                    .reduce(price, BigDecimal::add);
+                    .reduce(price, BigDecimal::add));
         }
 
         return price;

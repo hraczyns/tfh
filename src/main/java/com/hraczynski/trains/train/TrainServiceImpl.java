@@ -68,20 +68,22 @@ public class TrainServiceImpl extends AbstractService<Train, TrainRepository> im
     }
 
     @Override
-    public void update(TrainRequest request) {
+    public void update(Long id, TrainRequest request) {
         checkInput(request);
-        getEntityById(request.getId());
+        getEntityById(id);
 
-        log.info("Updating Train with id = {}", request.getId());
-        trainRepository.save(mapper.map(request, Train.class));
+        log.info("Updating Train with id = {}", id);
+        Train train = mapper.map(request, Train.class);
+        train.setId(id);
+        trainRepository.save(train);
     }
 
     @Override
-    public void patch(TrainRequest request) {
+    public void patch(Long id, TrainRequest request) {
         checkInput(request);
         Train entityById = getEntityById(request.getId());
 
-        PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(request, entityById);
+        PropertiesCopier.copyNotNullAndNotEmptyPropertiesUsingDifferentClasses(request, entityById, "id");
 
         log.info("Patching Train with id = {}", request.getId());
         trainRepository.save(entityById);
