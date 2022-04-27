@@ -9,6 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,4 +28,17 @@ public class StopTime {
     private LocalDateTime arrivalTime;
     @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private Trip trip;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof StopTime)) return false;
+        StopTime stopTime = (StopTime) o;
+        return Objects.equals(id, stopTime.id) && Objects.equals(stop, stopTime.stop) && Objects.equals(departureTime, stopTime.departureTime) && Objects.equals(arrivalTime, stopTime.arrivalTime) && Objects.equals(trip, stopTime.trip);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, stop, departureTime, arrivalTime, trip);
+    }
 }

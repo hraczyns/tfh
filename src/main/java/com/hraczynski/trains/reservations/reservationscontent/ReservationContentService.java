@@ -2,12 +2,12 @@ package com.hraczynski.trains.reservations.reservationscontent;
 
 import com.hraczynski.trains.email.EmailExtractor;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
-import com.hraczynski.trains.passengers.PassengerNotRegistered;
-import com.hraczynski.trains.passengers.PassengerNotRegisteredMapper;
-import com.hraczynski.trains.passengers.PassengerWithDiscount;
+import com.hraczynski.trains.passengers.unregistered.PassengerNotRegistered;
+import com.hraczynski.trains.passengers.unregistered.PassengerNotRegisteredMapper;
+import com.hraczynski.trains.passengers.discount.PassengerWithDiscount;
 import com.hraczynski.trains.payment.Discount;
-import com.hraczynski.trains.payment.Payment;
-import com.hraczynski.trains.payment.Price;
+import com.hraczynski.trains.payment.payment.Payment;
+import com.hraczynski.trains.payment.price.Price;
 import com.hraczynski.trains.reservations.Reservation;
 import com.hraczynski.trains.reservations.ReservationRepository;
 import com.hraczynski.trains.reservations.ReservationStatus;

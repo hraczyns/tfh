@@ -5,6 +5,7 @@ import com.hraczynski.trains.city.CityDto;
 import com.hraczynski.trains.city.CityRepository;
 import com.hraczynski.trains.city.CityRepresentationModelAssembler;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
+import com.hraczynski.trains.trip.Trip;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,6 @@ public record StopTimeMapper(
 
 
     public StopTimeDto entityToDto(StopTime stopTime) {
-        log.info("Mapping StopTime to StopTimeDto");
         StopTimeDto stopTimeDto = new StopTimeDto();
         stopTimeDto.setId(stopTime.getId());
         stopTimeDto.setCityDto(cityRepresentationModelAssembler.toModel(stopTime.getStop()));
@@ -30,8 +30,29 @@ public record StopTimeMapper(
         return stopTimeDto;
     }
 
+    public StopTimeExtendedDto entityToExtendedDto(StopTime stopTime) {
+        StopTimeDto stopTimeDto = entityToDto(stopTime);
+        Trip trip = stopTime.getTrip();
+        StopTimeExtendedDto stopTimeExtendedDto = new StopTimeExtendedDto();
+        stopTimeExtendedDto.setStopTimeDto(stopTimeDto);
+        stopTimeExtendedDto.setTripId(trip.getId());
+        stopTimeExtendedDto.setTrainId(trip.getTrain().getId());
+        stopTimeExtendedDto.setTrainUnique(trip.getTrain().getRepresentationUnique());
+        stopTimeExtendedDto.setTrainClass(trip.getTrain().getModel().name());
+
+        StopTimeDto nextStopTimeDto = null;
+        List<StopTime> stopTimes = trip.getStopTimes();
+        for (int j = 0; j < stopTimes.size(); j++) {
+            StopTime stopTimeTemp = stopTimes.get(j);
+            if (stopTimeTemp.equals(stopTime) && j != stopTimes.size() - 1) {
+                nextStopTimeDto = entityToDto(stopTimes.get(j + 1));
+            }
+        }
+        stopTimeExtendedDto.setNextStopTimeDto(nextStopTimeDto);
+        return stopTimeExtendedDto;
+    }
+
     public StopTime requestToEntity(StopTimeRequest stopTimeRequest) {
-        log.info("Mapping StopTimeRequest to StopTime");
         StopTime stopTime = new StopTime();
         City city = findCityById(stopTimeRequest.getCityId());
         stopTime.setStop(city);
@@ -50,8 +71,6 @@ public record StopTimeMapper(
     }
 
     public StopTimeDto requestToDto(StopTimeRequest stopTimeRequest) {
-        log.info("Mapping StopTimeRequest to StopTimeDto");
-
         City city = findCityById(stopTimeRequest.getCityId());
         CityDto cityDto = mapper.map(city, CityDto.class);
 

@@ -32,8 +32,8 @@ public class TrainController {
         return new ResponseEntity<>(collectionModel, HttpStatus.OK);
     }
 
-    @GetMapping
-    public ResponseEntity<TrainDto> findById(@RequestParam("id") Long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<TrainDto> findById(@PathVariable Long id) {
         Train train = trainService.findById(id);
         TrainDto trainDto = assembler.toModel(train);
         specifyUsedParameter(trainDto);
@@ -76,7 +76,7 @@ public class TrainController {
 
     private HttpHeaders getHttpHeadersForImageOutput() {
         final HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Type", "images/svg+xml");
+        headers.add("Content-Type", "image/png");
         return headers;
     }
 

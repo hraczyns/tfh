@@ -1,5 +1,6 @@
 package com.hraczynski.trains.stoptime;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -28,9 +29,18 @@ public interface StopsTimeRepository extends CrudRepository<StopTime, Long> {
             "select distinct a from StopTime a " +
             "join fetch a.stop b " +
             "join fetch a.trip c " +
+            "join fetch c.train d " +
             "where b.id = :cityId " +
-            "and a.arrivalTime > :startTime " +
-            "order by a.arrivalTime")
-    List<StopTime> findByCityIdAndArrivalTimeGreaterThanOrderByArrivalTime(@Param("cityId") Long cityId, @Param("startTime") LocalDateTime startTime);
+            "and a.departureTime between :startTime and :stopTime " +
+            "order by a.departureTime")
+    List<StopTime> findByCityIdAndDepartureTimeBetweenAndOrderByArrivalTime(@Param("cityId") Long cityId, @Param("startTime") LocalDateTime startTime, @Param("stopTime") LocalDateTime stopTime, Pageable pageable);
+
+    @Query(value = "" +
+            "select count(a) from StopTime a " +
+            "join a.stop b " +
+            "where b.id = :cityId " +
+            "and a.departureTime between :startTime and :stopTime ")
+    int countByCityIdAndDepartureTimeBetweenAndOrderByArrivalTime(@Param("cityId") Long cityId, @Param("startTime") LocalDateTime startTime, @Param("stopTime") LocalDateTime stopTime);
+
 }
 

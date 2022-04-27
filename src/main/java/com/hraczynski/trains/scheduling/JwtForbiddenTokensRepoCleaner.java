@@ -1,7 +1,7 @@
 package com.hraczynski.trains.scheduling;
 
-import com.hraczynski.trains.security.JwtForbiddenToken;
-import com.hraczynski.trains.security.JwtForbiddenTokensRepository;
+import com.hraczynski.trains.security.jwt.JwtForbiddenToken;
+import com.hraczynski.trains.security.jwt.JwtForbiddenTokensRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

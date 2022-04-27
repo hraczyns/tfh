@@ -1,6 +1,6 @@
 package com.hraczynski.trains.exceptions.definitions;
 
-import com.hraczynski.trains.user.RegisterValidation;
+import com.hraczynski.trains.user.register.RegisterValidation;
 import lombok.Getter;
 
 import java.util.Collections;

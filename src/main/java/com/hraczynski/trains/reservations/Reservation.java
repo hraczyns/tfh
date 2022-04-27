@@ -1,8 +1,7 @@
 package com.hraczynski.trains.reservations;
 
-import com.hraczynski.trains.passengers.Passenger;
-import com.hraczynski.trains.passengers.PassengerWithDiscount;
-import com.hraczynski.trains.payment.Price;
+import com.hraczynski.trains.passengers.discount.PassengerWithDiscount;
+import com.hraczynski.trains.payment.price.Price;
 import com.hraczynski.trains.stoptime.StopTime;
 import com.hraczynski.trains.train.Train;
 import lombok.*;

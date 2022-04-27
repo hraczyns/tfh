@@ -10,10 +10,10 @@ import java.util.Arrays;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public enum ImagesPaths {
-    NORMAL(TrainType.NORMAL, "/static/images/normal.svg"),
-    FAST(TrainType.FAST, "/static/images/fast.svg"),
-    PREMIUM(TrainType.PREMIUM, "/static/images/premium.svg"),
-    ECONOMIC(TrainType.ECONOMIC, "/static/images/economic.svg");
+    NORMAL(TrainType.NORMAL, "/static/images/normal_alt.png"),
+    FAST(TrainType.FAST, "/static/images/fast_alt.png"),
+    PREMIUM(TrainType.PREMIUM, "/static/images/premium_alt.png"),
+    ECONOMIC(TrainType.ECONOMIC, "/static/images/economic_alt.png");
 
     private final TrainType trainType;
     private final String path;

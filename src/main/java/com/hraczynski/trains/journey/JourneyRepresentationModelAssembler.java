@@ -7,7 +7,6 @@ import com.hraczynski.trains.city.City;
 import com.hraczynski.trains.city.CityRepresentationModelAssembler;
 import com.hraczynski.trains.routefinder.RouteFinderController;
 import com.hraczynski.trains.stoptime.StopTime;
-import com.hraczynski.trains.stoptime.StopTimeDto;
 import com.hraczynski.trains.stoptime.StopTimeMapper;
 import com.hraczynski.trains.train.Train;
 import com.hraczynski.trains.train.TrainDto;

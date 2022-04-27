@@ -1,5 +1,8 @@
 package com.hraczynski.trains.passengers;
 
+import com.hraczynski.trains.passengers.discount.PassengerWithDiscount;
+import com.hraczynski.trains.passengers.discount.PassengerWithDiscountRequest;
+
 import java.util.Set;
 
 public interface PassengerService {

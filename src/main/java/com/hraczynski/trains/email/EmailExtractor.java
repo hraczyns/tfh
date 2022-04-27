@@ -1,7 +1,7 @@
 package com.hraczynski.trains.email;
 
-import com.hraczynski.trains.passengers.PassengerNotRegistered;
-import com.hraczynski.trains.passengers.PassengerNotRegisteredMapper;
+import com.hraczynski.trains.passengers.unregistered.PassengerNotRegistered;
+import com.hraczynski.trains.passengers.unregistered.PassengerNotRegisteredMapper;
 import com.hraczynski.trains.reservations.Reservation;
 import com.hraczynski.trains.reservations.ReservationRequest;
 import lombok.RequiredArgsConstructor;

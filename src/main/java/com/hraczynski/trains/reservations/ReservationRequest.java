@@ -1,7 +1,7 @@
 package com.hraczynski.trains.reservations;
 
-import com.hraczynski.trains.passengers.PassengerNotRegistered;
-import com.hraczynski.trains.passengers.PassengerWithDiscountRequest;
+import com.hraczynski.trains.passengers.unregistered.PassengerNotRegistered;
+import com.hraczynski.trains.passengers.discount.PassengerWithDiscountRequest;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;

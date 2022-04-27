@@ -1,7 +1,7 @@
 package com.hraczynski.trains.exceptions.responses;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.hraczynski.trains.user.RegisterValidation;
+import com.hraczynski.trains.user.register.RegisterValidation;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.internal.engine.path.PathImpl;

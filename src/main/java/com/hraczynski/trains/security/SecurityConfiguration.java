@@ -1,5 +1,8 @@
 package com.hraczynski.trains.security;
 
+import com.hraczynski.trains.security.jwt.JwtCookieMergerFilter;
+import com.hraczynski.trains.security.jwt.JwtTokenAuthenticationFilter;
+import com.hraczynski.trains.security.jwt.JwtTokenAuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -41,7 +44,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Override
     public void configure(WebSecurity web) {
         web.ignoring()
-                .antMatchers("/h2-console/**","/swagger-ui/**", "/swagger-resources/**", "/v2/api-docs");
+                .antMatchers("/h2-console/**", "/swagger-ui/**", "/swagger-resources/**", "/v2/api-docs");
     }
 
     @Override
@@ -58,7 +61,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
                 // general
                 .authorizeRequests()
-                .antMatchers(GET, "/api/cities/**", "/api/trips/**", "/api/trains/**", "/api/search/**").permitAll()
+                .antMatchers(GET, "/api/cities/**", "/api/trips/**", "/api/trains/**", "/api/search/**", "/api/information/timetable/**").permitAll()
                 .antMatchers("/api/cities/**", "/api/trips/**", "/api/trains/**").hasRole("ADMIN")
                 .antMatchers("/api/payment/**").permitAll()
                 // passengers
@@ -70,7 +73,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/reservations/passengers/{passengerId}").access("hasRole('ADMIN') or (hasRole('USER') and @userSecurityCheck.hasPassengerId(authentication,#passengerId))")
                 .antMatchers("/api/reservations/**").permitAll()
                 // auth
-                .antMatchers("/api/login","/api/auth/check","api/logout","/api/register","/api/verification-token").permitAll()
+                .antMatchers("/api/login", "/api/auth/check", "api/logout", "/api/register", "/api/verification-token").permitAll()
                 //
                 .anyRequest().authenticated()
                 .and()

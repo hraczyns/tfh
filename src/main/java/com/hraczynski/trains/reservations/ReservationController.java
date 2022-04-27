@@ -1,8 +1,8 @@
 package com.hraczynski.trains.reservations;
 
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
-import com.hraczynski.trains.payment.Payment;
-import com.hraczynski.trains.payment.PaymentService;
+import com.hraczynski.trains.payment.payment.Payment;
+import com.hraczynski.trains.payment.payment.PaymentService;
 import com.hraczynski.trains.reservations.reservationscontent.ReservationContentDto;
 import com.hraczynski.trains.reservations.reservationscontent.ReservationContentService;
 import lombok.RequiredArgsConstructor;

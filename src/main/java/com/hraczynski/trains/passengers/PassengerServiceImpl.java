@@ -2,6 +2,9 @@ package com.hraczynski.trains.passengers;
 
 import com.hraczynski.trains.AbstractService;
 import com.hraczynski.trains.exceptions.definitions.EntityNotFoundException;
+import com.hraczynski.trains.passengers.discount.PassengerWithDiscount;
+import com.hraczynski.trains.passengers.discount.PassengerWithDiscountRepository;
+import com.hraczynski.trains.passengers.discount.PassengerWithDiscountRequest;
 import com.hraczynski.trains.payment.Discount;
 import com.hraczynski.trains.utils.PropertiesCopier;
 import lombok.RequiredArgsConstructor;
