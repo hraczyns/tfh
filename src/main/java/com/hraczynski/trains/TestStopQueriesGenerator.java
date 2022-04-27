@@ -35,7 +35,7 @@ public class TestStopQueriesGenerator {
         List<String> queriesStops = new ArrayList<>();
         List<String> queriesTrip = new ArrayList<>();
         List<String> trainQueries = new ArrayList<>();
-        List<String> fileContent = Files.readAllLines(Path.of("przejazdy.txt"));
+        List<String> fileContent = Files.readAllLines(Path.of("test_routes.txt"));
         int id = 1;
         int tripId = 1;
         int perDay = 4;
