@@ -17,7 +17,7 @@ import java.time.LocalDateTime;
 public class JwtForbiddenToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
-    private String id;
+    private Long id;
     private LocalDateTime expiresAt;
     @Column(length = 511)
     private String value;
