@@ -16,7 +16,8 @@ public interface StopsTimeRepository extends CrudRepository<StopTime, Long> {
             "select distinct a from StopTime a " +
             "join fetch a.trip " +
             "join fetch a.stop b " +
-            "join fetch b.country")
+            "join fetch b.country " +
+            "order by a.id")
     List<StopTime> findAll();
 
     @Query(value = "" +
