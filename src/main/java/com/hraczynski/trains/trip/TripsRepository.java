@@ -16,7 +16,8 @@ public interface TripsRepository extends PagingAndSortingRepository<Trip, Long> 
             "join fetch a.stopTimes b " +
             "join fetch b.stop c " +
             "join fetch c.country d " +
-            "join fetch a.train")
+            "join fetch a.train " +
+            "order by a.id")
     Set<Trip> findAll();
 
     Optional<Trip> findById(Long id);
