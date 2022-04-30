@@ -63,8 +63,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .authorizeRequests()
                 .antMatchers(GET, "/api/cities/**", "/api/trips/**", "/api/trains/**", "/api/search/**", "/api/information/timetable/**").permitAll()
                 .antMatchers("/api/cities/**", "/api/trips/**", "/api/trains/**").hasRole("ADMIN")
-                .antMatchers("/api/payment/**").permitAll()
-                .antMatchers("/api/payment/done**").permitAll()
+                .antMatchers("/api/payment/**","/payment/**").permitAll()
                 // passengers
                 .antMatchers(POST, "/api/passengers").permitAll()
                 .antMatchers("/api/passengers/{passengerId}").access("hasRole('ADMIN') or (hasRole('USER') and @userSecurityCheck.hasPassengerId(authentication,#passengerId))")
