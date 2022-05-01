@@ -69,6 +69,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/passengers/{passengerId}").access("hasRole('ADMIN') or (hasRole('USER') and @userSecurityCheck.hasPassengerId(authentication,#passengerId))")
                 // reservations
                 .antMatchers(POST, "api/reservations").permitAll()
+                .antMatchers("/api/reservations/content**").permitAll()
                 .antMatchers("/api/reservations/{reservationId}").access("hasRole('ADMIN') or (hasRole('USER') and @userSecurityCheck.hasPassengerIdByReservationId(authentication,#reservationId))")
                 .antMatchers("/api/reservations/passengers/{passengerId}").access("hasRole('ADMIN') or (hasRole('USER') and @userSecurityCheck.hasPassengerId(authentication,#passengerId))")
                 .antMatchers("/api/reservations/**").permitAll()
